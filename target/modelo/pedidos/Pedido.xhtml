@@ -1,0 +1,222 @@
+
+<!DOCTYPE html>
+<html  xmlns="http://www.w3.org/1999/xhtml"
+       xmlns:h="http://java.sun.com/jsf/html"
+       xmlns:f="http://java.sun.com/jsf/core"
+       xmlns:p="http://primefaces.org/ui"
+       xmlns:pm="http://primefaces.org/mobile"
+       xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
+
+    <f:view renderKitId="PRIMEFACES_MOBILE" />
+
+    <h:head>      
+        <f:facet name="first">
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <h:outputStylesheet library="style" name="pedidoMobile.css"/>
+            <h:outputStylesheet library="primefaces" name="grid/grid.css"/>
+            <h:outputStylesheet library="style" name="layout.css"/>
+            <h:outputStylesheet library="style" name="components.css"/>
+            <!--            <h:outputStylesheet library="style" name="custom.css"/>-->
+            <h:outputStylesheet library="style" name="sistema.css"/>
+            <!--            <h:outputScript target="body" library="primefaces" name="jquery/jquery.js"/>-->
+            <h:outputScript target="body" library="js" name="app.js"/>
+            <h:outputScript target="body" library="js" name="util.js"/>
+        </f:facet>
+    </h:head>
+
+    <h:body>
+
+        <pm:page id="lancProduto">
+
+            <header class="nj-topbar">
+                <h:graphicImage library="img" 
+                                name="logo.png"/>
+                <a href="#" style="width: 20px;" class="nj-toggle js-alternar"><i class="fa fa-bars"></i></a>
+                <a href="#" style="width: 20px;" class="nj-toggle " onclick="subir()"> <i class="fa fa-search"/></a>
+
+                <!--                <p:button outcome="pm:itens" /> -->
+
+            </header>   
+            <aside class="nj-sidebar js-sidebar">
+                <nav class="nj-menu">
+                    <h:form>
+                        <p:growl autoUpdate="true"/>
+                        <p:menu toggleable="true" model="#{contextoBean.menuModel}"/>
+                    </h:form>
+                </nav>
+            </aside>
+            <pm:content styleClass="conteudo js-content" >
+                <h:form id="form">
+                    <p:growl id="msg" />
+                    <p:inputText id="buscaProduto" placeholder="Busca" value="#{cadastroPedidoBean.nomeProduto}" >
+                        <p:ajax event="keyup" listener="#{cadastroPedidoBean.pesquisar}" process="@this" update="@form:listaProdutos" />
+
+                    </p:inputText>
+                    <p:dataList id="listaProdutos" value="#{cadastroPedidoBean.todosProdutos}" var="produto" pt:data-inset="true" >                        
+                        <p:graphicImage library="img" name="#{produto.codigoProduto}.png" styleClass="round" />
+                        <p>#{produto.nome}</p>
+                        <p style="float: right;">R$ #{produto.valorUnitario}</p>                         
+                        <p:ajax event="tap" listener="#{cadastroPedidoBean.onRowSelect}" oncomplete="PF('dlg').show();" update="@form:dlg" />
+                    </p:dataList>
+
+                    <p:dialog id="dlg" widgetVar="dlg">
+                        <h:outputText value="#{cadastroPedidoBean.produtoLinhaEditavel.nome}"/>
+                        <br /> <br />
+                        <div class="ui-fluid">
+                            <p:panelGrid  columns="1" >
+                                <h:outputText  value="Qtde"  />
+                                <p:inputText value="#{cadastroPedidoBean.quantidadeItem}"/>
+                                <h:outputText value="Marca Desejada" />
+                                <p:inputText value="#{cadastroPedidoBean.itemDescricao}"/>
+                            </p:panelGrid>
+                            <p:commandButton value="Salvar" action="#{cadastroPedidoBean.adicionaItem}" process="@form" oncomplete="PF('dlg').hide();" 
+                                             update="msg :itens:frmItens:itens  :itens:frmItens:totalPedido :finalizar:frmFinalizar:totalPedido" />                            
+                        </div>
+                    </p:dialog>
+
+                </h:form>
+            </pm:content>
+        </pm:page>
+
+        <pm:page id="itens">       
+
+            <header class="nj-topbar">
+                <h:graphicImage library="img" name="logo.png"/>
+                <a href="#" style="width: 20px;" class="nj-toggle js-alternar"><i class="fa fa-bars"></i></a>                 
+                <!--                <p:button outcome="pm:itens" /> -->
+                <h:form>
+                    <a id="addItem" href="#lancProduto" class="round addItem" >
+                        <i id="iconePlus" class="fa fa-plus"></i>
+                    </a>
+                </h:form>
+            </header>  
+            <aside class="nj-sidebar js-sidebar">
+                <nav class="nj-menu">
+                    <h:form>
+                        <p:growl autoUpdate="true"/>
+                        <p:menu toggleable="true" model="#{contextoBean.menuModel}"/>
+                    </h:form>
+                </nav>
+            </aside>
+
+            <pm:content styleClass="conteudo">
+                <h:form id="frmItens">                      
+
+                    <p:dataList id="itens" widgetVar="itens" value="#{cadastroPedidoBean.pedido.itens}" var="item" pt:data-inset="true" >
+
+                        <p:graphicImage library="img" name="#{item.produto.codigoProduto}.png" styleClass="round" />
+                        <p>#{item.produto.nome}</p>
+                        <p style="float: right;">R$ #{item.valorTotal}</p> 
+
+                        <p:ajax event="taphold" listener="#{cadastroPedidoBean.onRowSelect1}" oncomplete="PF('dlgExcluir').show();" update="@form:dlgExcluir" />
+
+                    </p:dataList>     
+
+                    <p:dialog id="dlgExcluir" widgetVar="dlgExcluir">
+                        <h:outputText value="Deseja Excluir o Produto" />
+                        <br /> <br />
+
+                    </p:dialog>
+
+                    <p:outputLabel value="Total do pedido" style="font-weight: bold; font-size: 1.1em"/>
+                    <h:outputText value="#{cadastroPedidoBean.pedido.valorTotal}" 
+                                  style="font-weight: bold; font-size: 1.1em" id="totalPedido">
+                        <f:convertNumber type="currency" />
+                    </h:outputText>
+                    <footer > 
+                        <p:button value="Finalizar" outcome="pm:finalizar"/>  
+                    </footer>
+
+                </h:form>
+            </pm:content>
+
+        </pm:page>
+
+        <pm:page id="finalizar">
+            <header class="nj-topbar">
+                <h:graphicImage library="img" name="logo.png"/>
+                <a href="#" style="width: 20px;" class="nj-toggle js-alternar"><i class="fa fa-bars"></i></a>                 
+
+                <!--                <p:button outcome="pm:itens" /> -->
+            </header>    
+
+            <aside class="nj-sidebar js-sidebar">
+                <nav class="nj-menu">
+                    <h:form>
+                        <p:growl autoUpdate="true"/>
+                        <p:menu toggleable="true" model="#{contextoBean.menuModel}"/>
+                    </h:form>
+                </nav>
+            </aside>
+            <pm:content styleClass="conteudo">                
+                <h:form id="frmFinalizar">
+                    <p:toolbar>
+
+                        <f:facet name="left">
+                            <p:commandButton value="Salvar" action="#{cadastroPedidoBean.salvar}"
+                                             update="@form" disabled="#{cadastroPedidoBean.pedido.naoAlteravel}"/>                            
+                        </f:facet>
+
+                        <f:facet name="right">
+                            <p:commandButton value="Enviar" action="#{emissaoPedidoBean.emitirPedido}"
+                                             process="@form" update="@form" disabled="#{cadastroPedidoBean.pedido.naoEmissivel}"/>
+
+                        </f:facet>
+
+                    </p:toolbar>
+                    <p:outputLabel value="Número" rendered="#{cadastroPedidoBean.pedido.existente}"/>
+                    <h:outputText value="#{cadastroPedidoBean.pedido.id}" rendered="#{cadastroPedidoBean.pedido.existente}"/>
+
+                    <p:outputLabel value="Data de criação" rendered="#{cadastroPedidoBean.pedido.existente}" />
+                    <h:outputText value="#{cadastroPedidoBean.pedido.dataCriacao}" rendered="#{cadastroPedidoBean.pedido.existente}" >
+                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+
+                    <p:outputLabel value="Status" style="float: left; width: 50%"/>
+                    <h:outputText value="#{cadastroPedidoBean.pedido.status.descricao}" style="float: right; width: 50%" />
+                    <br /><br />
+
+                    <p:selectOneMenu id="formaPagamento" value="#{cadastroPedidoBean.pedido.formaPagamento}"
+                                     disabled="#{cadastroPedidoBean.pedido.naoAlteravel}" style="float: left; width: 50%">
+                        <f:selectItem itemLabel="Sel. Forma de Pagamento" />  
+                        <f:selectItems value="#{cadastroPedidoBean.formasPagamento}" var="formaPagamento" 
+                                       itemValue="#{formaPagamento}" itemLabel="#{formaPagamento.descricao}" />                      
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="Total do pedido" style="font-weight: bold; font-size: 1.1em"/>
+                    <h:outputText value="#{cadastroPedidoBean.pedido.valorTotal}" 
+                                  style="font-weight: bold; font-size: 1.1em" id="totalPedido">
+                        <f:convertNumber type="currency" />
+                    </h:outputText> 
+
+                    <p:panelGrid columns="1" style="width: 100%" columnClasses="ui-grid-col-2, ui-grid-col-4, ui-grid-col-2, ui-grid-col-4" layout="grid" class="panelgrid-noborder">
+                        <p:outputLabel value="Data da Entrega" for="dataEntrega"/>
+                        <p:calendar id="dataEntrega" size="10" pattern="dd/MM/yyyy" 
+                                    value="#{cadastroPedidoBean.pedido.dataEntrega}"/>
+
+
+                        <p:outputLabel value="Logradouro" for="entregaLogradouro" />
+                        <p:inputText id="entregaLogradouro" size="50" disabled="#{cadastroPedidoBean.pedido.naoAlteravel}"
+                                     value="#{cadastroPedidoBean.pedido.enderecoEntrega.logradouro}"/>
+
+                        <p:outputLabel value="Número" for="entregaNumero" />
+                        <p:inputText id="entregaNumero" size="5" value="#{cadastroPedidoBean.pedido.enderecoEntrega.numero}" disabled="#{cadastroPedidoBean.pedido.naoAlteravel}"/>
+
+                        <p:outputLabel value="Complemento" for="entregaComplemento" />
+                        <p:inputText id="entregaComplemento" size="50" value="#{cadastroPedidoBean.pedido.enderecoEntrega.complemento}" disabled="#{cadastroPedidoBean.pedido.naoAlteravel}"/>
+
+                        <p:outputLabel value="Cidade" for="entregaCidade" />
+                        <p:inputText id="entregaCidade" size="20" value="#{cadastroPedidoBean.pedido.enderecoEntrega.cidade}" disabled="#{cadastroPedidoBean.pedido.naoAlteravel}"/>
+
+                        <p:outputLabel value="Estado" for="entregaEstado" />
+                        <p:inputText id="entregaEstado" size="20" value="#{cadastroPedidoBean.pedido.enderecoEntrega.uf}" disabled="#{cadastroPedidoBean.pedido.naoAlteravel}"/>
+
+                        <p:outputLabel value="CEP" for="entregaCep" />
+                        <p:inputText id="entregaCep" size="10" value="#{cadastroPedidoBean.pedido.enderecoEntrega.cep}" disabled="#{cadastroPedidoBean.pedido.naoAlteravel}"/>
+                    </p:panelGrid>
+                </h:form>
+            </pm:content>
+        </pm:page>
+    </h:body>
+</html>

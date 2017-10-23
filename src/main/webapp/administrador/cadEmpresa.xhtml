@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/template/layout.xhtml">
+
+    <ui:define name="corpo">                   
+        <f:metadata>
+            <f:viewParam name="empresa" />
+            <f:viewAction action="#{cadPessoaController.inicializar}"/>
+            <!--<f:event listener="" type="preRenderView" />-->
+        </f:metadata>
+
+        <h:form id="frmCadPessoa" prependId="false">            
+            <p:toolbar id="tb" styleClass="nj-toolbar">
+                <p:toolbarGroup align="left">
+                    <p:outputLabel style="padding-top: 5px; font-weight: 500; font-size: 1.3em; font-weight: bold; display: table-cell; vertical-align: middle; ">
+                        <i class="fa fa-fw fa-save" style="color: #2db994; font-size: 15px; margin-left: 10px; margin-right: 5px"></i>Cadastro de Empresa
+                    </p:outputLabel>
+                </p:toolbarGroup>
+                <p:toolbarGroup align="right">
+                    <p:commandButton value="Salvar" icon="ui-icon-check" oncomplete="timeOut()" action="#{cadPessoaController.salvar}" />
+                    <span style="margin-right: 1px;"></span>
+                    <p:button value="Pesquisar" icon="fa fa-fw fa-search" outcome="busca"/>
+                    <span style="margin-right: 1px;"></span>
+                    <p:menuButton value="Relatório" style="margin-right: 15px;">
+                        <p:menuitem value="Save" icon="ui-icon-disk"/>
+                        <p:menuitem value="Update" icon="ui-icon-arrowrefresh-1-w"/>
+                        <p:menuitem value="Delete" icon="ui-icon-close"/>
+                        <p:separator />
+                        <p:menuitem value="Homepage" url="http://www.primefaces.org" icon="ui-icon-extlink"/>
+                    </p:menuButton>
+                </p:toolbarGroup>                             
+            </p:toolbar>
+            <p:messages id="messages" showDetail="false" autoUpdate="true" closable="true"/>
+            <p:sticky target="tb" />
+            <div style="margin-top: 7px;"> 
+                <div class="ui-fluid">
+                    <p:panelGrid columns="6" layout="grid"                              
+                                 styleClass="panelgrid-noborder"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2">
+
+                        <!--                    1 linha-->
+                        <p:outputLabel value="Nome da empresa" for="nEmpresa"/>
+                        <p:inputText id="nEmpresa" value="#{cadPessoaController.pessoa.nome}" />
+
+                        <p:outputLabel value="Telefone" for="telefone" />
+                        <p:inputMask  mask="(99)9999-9999" 
+                                      id="telefone" 
+                                      label="Telefone"
+                                      size="13" 
+                                      value="#{cadPessoaController.telefone}"
+                                      maxlength="13" 
+                                      requiredMessage="Campo Telefone obrigarório">
+                            <f:passThroughAttribute name="placeholder" value="(99)9999-9999" />	
+                            <f:validateLength minimum="13" maximum="13"/>	      
+                        </p:inputMask>
+
+                        <p:outputLabel value="Email" for="email" />
+                        <p:inputText id="email" value="#{cadPessoaController.pessoa.email}">
+                            <f:passThroughAttribute name="placeholder" value="email@email.com" />	
+                        </p:inputText>
+
+                        <p:outputLabel value="Ramo Atividade" for="atividade" />
+                        <p:selectOneMenu id="atividade">
+                            <f:selectItem itemLabel="Selecione" />
+                            <f:selectItem itemLabel="1 - Fazenda" itemValue="A vista" />
+                            <f:selectItem itemLabel="2 - Roupas" itemValue="30 dias" />
+                            <f:selectItem itemLabel="3 - Agrícola" itemValue="30 + 60 dias" />
+                        </p:selectOneMenu>
+
+                        <p:outputLabel value="Software Atual" for="software" />
+                        <p:selectOneMenu id="software">
+                            <f:selectItem itemLabel="Selecione" />
+                            <f:selectItem itemLabel="1 - Não possui" itemValue="A vista" />
+                            <f:selectItem itemLabel="2 - Alfa Sistema" itemValue="30 dias" />
+                            <f:selectItem itemLabel="3 - Psga" itemValue="30 + 60 dias" />
+                        </p:selectOneMenu>
+
+                    </p:panelGrid>
+
+                    <p:panelGrid columns="6" layout="grid" style="margin-top: 10px"                                
+                                 styleClass="panelgrid-noborder"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2">   
+
+                        <p:outputLabel value="Cidade" for="cidade" />
+                        <p:selectOneMenu id="cidade">
+                            <f:selectItem itemLabel="Selecione" />
+                            <f:selectItem itemLabel="1 - Pedra Preta" itemValue="A vista" />
+                            <f:selectItem itemLabel="2 - Rondonópolis" itemValue="30 dias" />
+                            <f:selectItem itemLabel="3 - Primavera do Leste" itemValue="30 + 60 dias" />
+                        </p:selectOneMenu>
+
+                        <p:outputLabel value="Cep" for="cep" />
+                        <p:inputMask  mask="99999-999" 
+                                      id="cep" 
+                                      label="Cep"
+                                      size="9" 
+                                      maxlength="9" 
+                                      requiredMessage="Cep obrigarório">
+                            <f:passThroughAttribute name="placeholder" value="99999-999" />	
+                            <f:validateLength minimum="9" maximum="9"/>	      
+                        </p:inputMask>
+
+                        <p:outputLabel value="Bairro" for="bairro" />
+                        <p:selectOneMenu id="bairro">
+                            <f:selectItem itemLabel="Selecione" />
+                            <f:selectItem itemLabel="1 - Vila Aurora" itemValue="A vista" />
+                            <f:selectItem itemLabel="2 - Jardim Aeroporto" itemValue="30 dias" />
+                            <f:selectItem itemLabel="3 - Buriti" itemValue="30 + 60 dias" />
+                        </p:selectOneMenu>
+
+                        <p:outputLabel value="Nº" for="numero" />
+                        <p:inputText id="numero" />
+
+                    </p:panelGrid>
+
+                    <p:panelGrid columns="6" layout="grid" style="margin-top: 10px"                                
+                                 styleClass="panelgrid-noborder"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2">   
+
+                        <p:outputLabel value="Cliente Potencial" for="clientePotencial" />
+                        <p:selectOneRadio id="clientePotencial" >
+                            <f:selectItem itemLabel="Sim" itemValue="sim" />
+                            <f:selectItem itemLabel="Nao" itemValue="nao" />                            
+                        </p:selectOneRadio>
+
+                        <p:outputLabel value="Produtos de Interresse" for="produto" />
+                        <p:selectOneRadio id="produto" >
+                            <f:selectItem itemLabel="ERP" itemValue="sim" />
+                            <f:selectItem itemLabel="Apps" itemValue="nao" />                            
+                            <f:selectItem itemLabel="WebSite" itemValue="nao" />                            
+                        </p:selectOneRadio>
+
+                        <p:outputLabel value="Resp Acompa" for="acompanhamento" />
+                        <p:selectOneMenu id="acompanhamento">
+                            <f:selectItem itemLabel="Selecione" />
+                            <f:selectItem itemLabel="1 - Aecio" itemValue="A vista" />
+                            <f:selectItem itemLabel="2 - Lemoel" itemValue="30 dias" />
+                            <f:selectItem itemLabel="3 - Carlos" itemValue="30 + 60 dias" />
+                        </p:selectOneMenu>
+
+                        <p:outputLabel value="Informações Adicionais" for="infoAdic" />
+                        <p:inputText id="infoAdic"/>
+
+                    </p:panelGrid>
+
+                    <p:panelGrid columns="6" layout="grid" style="margin-top: 10px"
+                                 styleClass="panelgrid-noborder"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2">  
+
+                        <p:outputLabel value="Primeira Anotação" for="anotacao" />
+                        <p:inputText id="anotacao"/>
+
+                        <p:outputLabel value="Resp Retorno" for="respRetorno" />
+                        <p:selectOneMenu id="respRetorno">
+                            <f:selectItem itemLabel="Selecione" />
+                            <f:selectItem itemLabel="1 - Aecio" itemValue="A vista" />
+                            <f:selectItem itemLabel="2 - Lemoel" itemValue="30 dias" />
+                            <f:selectItem itemLabel="3 - Carlos" itemValue="30 + 60 dias" />
+                        </p:selectOneMenu>
+
+                        <p:outputLabel value="Data retorno" for="dtRetorno" />
+                        <p:calendar id="dtRetorno"/>
+
+                        <p:outputLabel value="Cliente Interessou" for="interessou" />
+                        <p:selectOneRadio id="interessou" >
+                            <f:selectItem itemLabel="Sim" itemValue="sim" />
+                            <f:selectItem itemLabel="Nao" itemValue="nao" />                            
+                        </p:selectOneRadio>
+
+                    </p:panelGrid>                    
+                    <br/>
+                    <div style="float: right; width: 220px; margin-right: 5px; margin-bottom: 20px;margin-top:5px; ">
+                        <p:commandButton value="Salvar" icon="ui-icon-check" oncomplete="timeOut()" style="max-width: 100px; max-height: 40px;" action="#{cadPessoaController.salvar}" />
+                        <p:button value="Limpar" icon="fa fa-fw fa-eraser" style="max-width: 100px; max-height: 40px; margin-left: 10px" />
+                    </div>
+
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

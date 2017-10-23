@@ -1,0 +1,85 @@
+<ui:composition template="/WEB-INF/template/layout.xhtml"
+                xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <ui:define name="titulo">Pesquisa de produtos</ui:define>
+
+    <ui:define name="corpo">
+        <h:form id="frmPesquisa">
+
+            <p:toolbar id="tb" styleClass="nj-toolbar">
+                <br /><br />
+                <p:toolbarGroup align="left">      
+                    <p:outputLabel style="padding-top: 5px; font-weight: 500; font-size: 1.3em; font-weight: bold; display: table-cell; vertical-align: middle; ">
+                        <i class="fa fa-search" style="color: #2db994; font-size: 15px; margin-left: 10px; margin-right: 5px"></i>Pesquisa de Produtos
+                    </p:outputLabel>
+                </p:toolbarGroup>
+
+                <p:toolbarGroup align="right">
+                    <p:commandButton value="Pesquisar" action="#{pesquisaProdutosBean.pesquisar}"
+                                     update="@form" icon="fa fa-fw fa-search"/>
+                    <p:button value="Novo" icon="ui-icon-document" outcome="/administrador/CadastroProduto"/>
+                </p:toolbarGroup>
+            </p:toolbar>
+            <p:sticky target="tb" />
+            <p:messages autoUpdate="true" closable="true" />
+            <div class="ui-fluid">
+                <p:panelGrid columns="2" id="painel" style="width: 100%; margin-top: 20px"
+                             columnClasses="rotulo, campo">
+                    <p:outputLabel value="Codigo Produto" for="codigoProduto"/>
+                    <p:inputText id="codigoProduto" size="20" value="#{pesquisaProdutosBean.filtro.codigoProduto}" />
+
+                    <p:outputLabel value="Nome" for="nome"/>
+                    <p:inputText id="nome" size="60" value="#{pesquisaProdutosBean.filtro.nome}" />
+                </p:panelGrid>
+
+                <p:dataTable id="produtosTable" value="#{pesquisaProdutosBean.produtosFiltrados}" var="produto"
+                             style="margin-top: 20px" emptyMessage="Nenhum Produto Encontrado" rows="20"
+                             paginator="true" paginatorAlwaysVisible="false" paginatorPosition="bottom" >
+
+                    <p:column headerText="Codigo Produto" style="text-align: center; width: 100px">
+                        <h:outputText value="#{produto.codigoProduto}" />
+                    </p:column>
+
+                    <p:column headerText="Nome">
+                        <h:outputText value="#{produto.nome}"/>
+                    </p:column>     
+
+                    <p:column headerText="Categoria" style="width: 250px">
+                        <h:outputText value="#{produto.categoria.categoriaPai.descricao} - #{produto.categoria.descricao}"/>                    
+                    </p:column>
+
+                    <p:column headerText="Valor unitário" style="text-align: right; width: 120px">
+                        <h:outputText value="#{produto.valorUnitario}">
+                            <f:convertNumber type="currency"/>
+                        </h:outputText>
+                    </p:column>
+
+                    <p:column style="width: 100px; text-align: center">
+                        <p:button outcome="/administrador/CadastroProduto" icon="ui-icon-pencil" title="Editar">
+                            <f:param name="produto" value="#{produto.id}"></f:param>
+                        </p:button>
+                        <p:commandButton icon="ui-icon-trash" title="Excluir" oncomplete="PF('confirmacaoExclusao').show();"
+                                         process="@this" update=":frmPesquisa:confirmacaoExclusaoDialog">
+                            <f:setPropertyActionListener target="#{pesquisaProdutosBean.produtoSelecionado}"
+                                                         value="#{produto}" />
+
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+
+                <p:confirmDialog header="Exclusão de produto"
+                                 message="Tem certeza que deseja excluir o produto #{pesquisaProdutosBean.produtoSelecionado.codigoProduto}?"
+                                 widgetVar="confirmacaoExclusao" id="confirmacaoExclusaoDialog">
+                    <p:button value="Não" onclick="PF('confirmacaoExclusao').hide(); return false;" />
+                    <p:commandButton value="Sim" oncomplete="PF('confirmacaoExclusao').hide();"
+                                     action="#{pesquisaProdutosBean.excluir}" process="@this"
+                                     update=":frmPesquisa:produtosTable" />
+                </p:confirmDialog>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

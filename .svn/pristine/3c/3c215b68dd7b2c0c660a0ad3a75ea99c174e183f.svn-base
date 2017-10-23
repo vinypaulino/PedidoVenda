@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Naja</title>
+        <h:outputStylesheet library="style" name="bootstrap.css" />
+        <!-- Font awesome icon -->
+        <h:outputStylesheet library="style" name="font-awesome.css" />
+        <h:outputStylesheet library="style" name="login.css" />
+        <link rel="shortcut icon" type="image/x-icon"
+              href="#{request.contextPath}/resources/img/favicon.ico" />
+    </h:head>
+    <h:body>
+        <f:metadata>            
+            <f:event listener="#{loginController.preRender}" type="preRenderView" />
+        </f:metadata>
+
+        <!-- Form area -->
+        <div class="admin-form">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- Widget starts -->
+                        <div class="widget worange">
+                            <!-- Widget head -->
+                            <div class="widget-head">
+                                <i class="icon-lock"></i> Login
+                            </div>
+
+                            <div class="widget-content">
+                                <div class="padd">
+
+                                    <h:form id="frm" prependId="false" styleClass="form-horizontal">
+                                        <p:messages id="messages" autoUpdate="true" closable="true" />
+
+                                        <div class="form-group">
+                                            <p:outputLabel styleClass="control-label col-lg-3" value="Login" for="j_username" />
+                                            <div class="col-lg-3">
+                                                <p:inputText 
+                                                    required="true"
+                                                    requiredMessage="Digite seu Login"
+                                                    size="40" id="j_username" value="#{loginController.email}">
+                                                    <f:passThroughAttribute name="placeholder" value="Email" />
+                                                </p:inputText>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <p:outputLabel styleClass="control-label col-lg-3" value="Senha" for="j_password"/>
+                                            <div class="col-lg-9">
+                                                <p:password 
+                                                    required="true"
+                                                    requiredMessage="Digite a Senha"
+                                                    size="40" 
+                                                    id="j_password">
+                                                    <f:passThroughAttribute name="placeholder" value="Senha" />
+                                                </p:password>
+                                            </div>
+                                        </div>
+
+                                        <!-- Remember me checkbox and sign in button -->
+                                        <div class="form-group">
+                                            <div class="col-lg-9 col-lg-offset-3">
+                                                <div class="checkbox">
+                                                    <label> <input type="checkbox"
+                                                                   name="_spring_security_remember_me" /> Entrar automaticamente
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-9 col-lg-offset-3">
+                                            <h:commandButton  value="Entrar" class="btn btn-info btn-sm" action="#{loginController.login}" />
+                                            <!--<p:commandButton value="Entrar" styleClass="btn btn-info btn-sm" action="" ajax="false" />-->
+                                            <button type="reset" class="btn btn-default btn-sm" >Limpar</button>
+                                        </div>
+                                        <br/>
+                                    </h:form>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </h:body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/template/layout.xhtml">
+
+    <ui:define name="corpo">                   
+        <f:metadata>
+            <f:viewParam name="empresa" />
+            <f:viewAction action="#{cadProjetoController.init}"/>
+            <!--<f:event listener="" type="preRenderView" />-->
+        </f:metadata>
+
+        <h:form  id="frmCadProjeto" prependId="false">
+            <h:inputHidden id="projetoId" value="#{cadProjetoController.projeto.id}"/>
+            <p:toolbar id="tb" styleClass="nj-toolbar">
+                <p:toolbarGroup align="left">
+                    <p:outputLabel style="padding-top: 5px; font-weight: 500; font-size: 1.3em; font-weight: bold; display: table-cell; vertical-align: middle; ">
+                        <i class="fa fa-fw fa-save" style="color: #2db994; font-size: 15px; margin-left: 10px; margin-right: 5px"></i>Projetos
+                    </p:outputLabel>
+                </p:toolbarGroup>
+                <p:toolbarGroup align="right">
+                    <p:commandButton value="Salvar" update="nomeProjeto dtProjeto" oncomplete="timeOut()" icon="ui-icon-check" action="#{cadProjetoController.salvar}" />
+                    <span style="margin-right: 25px;"></span>
+                </p:toolbarGroup>
+            </p:toolbar>
+            <p:messages id="messages" showDetail="false" autoUpdate="true" closable="true"/>
+            <p:sticky target="tb" />
+            <div style="margin-top: 7px;">
+                <div class="ui-fluid">
+                    <p:panelGrid columns="3" layout="grid" id="pgProjeto"                                 
+                                 styleClass="panelgrid-noborder"
+                                 columnClasses="ui-grid-col-2,ui-grid-col-6,ui-grid-col-4">
+
+                        <p:outputLabel value="Nome Projeto" for="nomeProjeto"/>
+                        <p:inputText id="nomeProjeto" required="true" value="#{cadProjetoController.projeto.nome}" />                        
+                        <h:panelGroup>
+                            <p:commandButton value="Salvar" update="nomeProjeto dtProjeto " oncomplete="timeOut()"  icon="ui-icon-check" style="max-width: 100px; max-height: 40px;" action="#{cadProjetoController.salvar}" />
+                            <p:button value="Limpar" icon="fa fa-fw fa-eraser" style="max-width: 100px; max-height: 40px; margin-left: 10px" />   
+                        </h:panelGroup>
+                    </p:panelGrid>       
+                    <br/>                                        
+                </div>
+            </div>
+        </h:form>
+        <h:form prependId="false" id="frmProjetoList">
+            <div style="margin-top:10px; ">
+                <p:dataTable 
+                    id="dtProjeto"
+                    paginator="true"                                                      
+                    rows="20"
+                    paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                    rowsPerPageTemplate="10,15,20"
+                    resizableColumns="true" 
+                    draggableColumns="true"                                
+                    emptyMessage="Nenhum Projeto Cadastrado."
+                    var="projeto" value="#{cadProjetoController.projetoList}"  >
+                    <f:facet name="header">Projetos</f:facet>                                
+                    <p:column headerText="Id" style="text-align:center; width: 10%">
+                        <h:outputText value="#{projeto.id}" />
+                    </p:column>
+                    <p:column headerText="Nome">
+                        <h:outputText value="#{projeto.nome}" />
+                    </p:column>
+
+                    <p:column headerText="Ferramenta" style="text-align:center;width:10%;">                                                
+                        <p:commandButton  style="width: 30px" icon="ui-icon-trash" process="@this" update="projetoId, frmProjetoList" action="#{cadProjetoController.deletar}" >
+                            <f:setPropertyActionListener value="#{projeto}" target="#{cadProjetoController.projeto}" />
+                        </p:commandButton>
+                        <span style="padding-left:4px"></span>
+                        <p:commandButton  style="width: 30px"  icon="ui-icon-pencil" process="@this" update="projetoId nomeProjeto " >
+                            <f:setPropertyActionListener value="#{projeto}" target="#{cadProjetoController.projeto}" />
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </div>
+        </h:form>        
+    </ui:define>
+</ui:composition>

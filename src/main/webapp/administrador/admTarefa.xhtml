@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/template/layout.xhtml">
+
+    <ui:define name="corpo">                   
+        <f:metadata>
+            <f:viewParam name="empresa" />
+            <f:viewAction action="#{admPropriedadesTarefaController.init}"/>
+            <!--<f:event listener="" type="preRenderView" />-->
+        </f:metadata>
+
+        <h:form  id="frmCadProjeto" prependId="false">           
+            <h:inputHidden id="estadoID" value="#{admPropriedadesTarefaController.tarefaEstado.id}"/>
+            <h:inputHidden id="tipoID" value="#{admPropriedadesTarefaController.tarefaTipo.id}"/>
+            <h:inputHidden id="prioridadeID" value="#{admPropriedadesTarefaController.tarefaPrioridade.id}"/>
+            <h:inputHidden id="atividadeID" value="#{admPropriedadesTarefaController.tarefaAtividade.id}"/>
+            <p:toolbar id="tb" styleClass="nj-toolbar">
+                <p:toolbarGroup align="left">
+                    <p:outputLabel style="padding-top: 5px; font-weight: 500; font-size: 1.3em; font-weight: bold; display: table-cell; vertical-align: middle; ">
+                        <i class="fa fa-fw fa-save" style="color: #2db994; font-size: 15px; margin-left: 10px; margin-right: 5px"></i>Adiministrar Tarefa
+                    </p:outputLabel>
+                </p:toolbarGroup>
+            </p:toolbar>     
+            <p:messages id="messages" showDetail="false" autoUpdate="true" closable="true"/>
+            <p:sticky target="tb" />
+            <div class="ui-fluid">
+                <p:tabView id="tabViewTarefa" dynamic="true" style="margin-top: 5px;" effect="fade" activeIndex="#{admPropriedadesTarefaController.i}">
+
+                    <!--########################  E S T A D O #############################-->
+
+                    <p:tab title="Estado">
+                        <p:panelGrid id="pgEstado"  columns="3" layout="grid" columnClasses="ui-grid-col-1,ui-grid-col-6,ui-grid-col-2">
+                            <p:outputLabel value="Estado" for="estadoNome"/>                            
+                            <p:inputText id="estadoNome" value="#{admPropriedadesTarefaController.tarefaEstado.descricao}" />
+                            <p:commandButton value="Salvar" 
+                                             update="dtEstado,tabViewTarefa:estadoNome,:estadoID" 
+                                             oncomplete="timeOut()"
+                                             icon="ui-icon-check" style="width: auto" 
+                                             action="#{admPropriedadesTarefaController.salvarEstado}"                                             
+                                             process=":estadoID,tabViewTarefa:estadoNome,@this"/>
+                        </p:panelGrid>
+                        <p:dataTable 
+                            paginator="true"                                                      
+                            rows="20"
+                            paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                            rowsPerPageTemplate="10,15,20"
+                            resizableColumns="true" 
+                            draggableColumns="true" 
+                            id="dtEstado" 
+                            value="#{admPropriedadesTarefaController.tarefaEstadoList}" 
+                            var="estado" 
+                            style="margin-top: 10px" 
+                            emptyMessage="Nenhum Estado da tarefa cadastrado" >
+                            <p:column style="text-align:center;width:10%;" headerText="ID" priority="3">
+                                <h:outputText value="#{estado.id}"/>
+                            </p:column>
+                            <p:column  headerText="Descrição" priority="1">
+                                <h:outputText value="#{estado.descricao}"/>
+                            </p:column>
+                            <p:column headerText="Ferramenta" style="text-align:center;width:10%;" priority="2" >
+                                <p:commandButton  style="width: 30px" icon="ui-icon-trash" process="@this" action="#{admPropriedadesTarefaController.deletarEstado}" update="tabViewTarefa:dtEstado,:estadoID,tabViewTarefa:estadoNome" >
+                                    <f:setPropertyActionListener value="#{estado.id}" target="#{admPropriedadesTarefaController.tarefaEstado.id}" />
+                                </p:commandButton>
+                                <span style="padding-left:4px"></span>                               
+                                <p:commandButton  style="width: 30px"  icon="ui-icon-pencil" process="@this" update="tabViewTarefa:estadoNome,:estadoID">
+                                    <f:setPropertyActionListener value="#{estado}" target="#{admPropriedadesTarefaController.tarefaEstado}" />
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                    </p:tab>
+
+                    <!--########################  T I P O #############################-->
+
+                    <p:tab title="Tipo" >
+                        <p:panelGrid columns="3" layout="grid" columnClasses="ui-grid-col-1,ui-grid-col-6,ui-grid-col-2">
+                            <p:outputLabel value="Tipo" for="tipoNome"/>
+                            <p:inputText id="tipoNome" required="true" value="#{admPropriedadesTarefaController.tarefaTipo.descricao}" />
+                            <p:commandButton value="Salvar" 
+                                             oncomplete="timeOut()" 
+                                             update="dtTipo,tabViewTarefa:tipoNome,:tipoID" 
+                                             icon="ui-icon-check" style="width: auto" 
+                                             action="#{admPropriedadesTarefaController.salvarTipo}"                                             
+                                             process=":tipoID,tabViewTarefa:tipoNome,@this"/>
+                        </p:panelGrid>
+                        <p:dataTable 
+                            paginator="true"                                                      
+                            rows="20"
+                            paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                            rowsPerPageTemplate="10,15,20"
+                            resizableColumns="true" 
+                            draggableColumns="true" 
+                            id="dtTipo" 
+                            value="#{admPropriedadesTarefaController.tarefaTipoList}" 
+                            var="tipo" 
+                            style="margin-top: 10px">
+
+                            <p:column headerText="ID" style="text-align:center;width:10%;" priority="2">
+                                <h:outputText value="#{tipo.id}"/>
+                            </p:column>
+                            <p:column headerText="Descrição" priority="1">
+                                <h:outputText value="#{tipo.descricao}"/>
+                            </p:column>
+                            <p:column headerText="Ferramenta" style="text-align:center;width:10%;">                                                
+                                <p:commandButton  style="width: 30px" icon="ui-icon-trash" process="@this" action="#{admPropriedadesTarefaController.deletarTipo}" update="tabViewTarefa:dtTipo,:tipoID,tabViewTarefa:tipoNome" >
+                                    <f:setPropertyActionListener value="#{tipo.id}" target="#{admPropriedadesTarefaController.tarefaTipo.id}" />
+                                </p:commandButton>
+                                <span style="padding-left:4px"></span>                               
+                                <p:commandButton  style="width: 30px"  icon="ui-icon-pencil" process="@this" update="tabViewTarefa:tipoNome,:tipoID">
+                                    <f:setPropertyActionListener value="#{tipo}" target="#{admPropriedadesTarefaController.tarefaTipo}" />
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                    </p:tab>
+
+                    <!--########################  P R I O R I D A D E #############################-->
+
+                    <p:tab title="Prioridade" >
+                        <p:panelGrid columns="3" layout="grid" columnClasses="ui-grid-col-1,ui-grid-col-6,ui-grid-col-2">
+                            <p:outputLabel value="Prioridade" for="prioridadeNome"/>
+                            <p:inputText id="prioridadeNome"  required="true"  value="#{admPropriedadesTarefaController.tarefaPrioridade.descricao}"/>
+                            <p:commandButton value="Salvar" 
+                                             oncomplete="timeOut()"
+                                             update="dtPrioridade,tabViewTarefa:prioridadeNome,:prioridadeID" 
+                                             icon="ui-icon-check" 
+                                             style="width: auto" 
+                                             action="#{admPropriedadesTarefaController.salvarPrioridade}"
+                                             process=":prioridadeID,tabViewTarefa:prioridadeNome,@this"/>
+                        </p:panelGrid>
+                        <p:dataTable 
+                            paginator="true"                                                      
+                            rows="20"
+                            paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                            rowsPerPageTemplate="10,15,20"
+                            resizableColumns="true" 
+                            draggableColumns="true" 
+                            id="dtPrioridade" 
+                            value="#{admPropriedadesTarefaController.tarefaPrioridadesList}" 
+                            var="prioridade" 
+                            style="margin-top: 10px">
+                            <p:column headerText="ID" style="text-align:center;width:10%;" priority="2">
+                                <h:outputText value="#{prioridade.id}"/>
+                            </p:column>
+                            <p:column headerText="Descrição" priority="1">
+                                <h:outputText value="#{prioridade.descricao}"/>
+                            </p:column>
+                            <p:column headerText="Ferramenta" style="text-align:center;width:10%;">                                                
+                                <p:commandButton  style="width: 30px" icon="ui-icon-trash" 
+                                                  process="@this" 
+                                                  action="#{admPropriedadesTarefaController.deletarPrioridade}" 
+                                                  update="tabViewTarefa:dtPrioridade,:prioridadeID,tabViewTarefa:prioridadeNome" >
+                                    <f:setPropertyActionListener value="#{prioridade.id}" target="#{admPropriedadesTarefaController.tarefaPrioridade.id}" />
+                                </p:commandButton>
+                                <span style="padding-left:4px"></span>                               
+                                <p:commandButton  style="width: 30px"  icon="ui-icon-pencil" process="@this" update="tabViewTarefa:prioridadeNome,:prioridadeID">
+                                    <f:setPropertyActionListener value="#{prioridade}" target="#{admPropriedadesTarefaController.tarefaPrioridade}" />
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                    </p:tab>
+
+                    <!--########################  A T I V I D A D E #############################-->
+
+                    <p:tab title="Atividade" >
+                        <p:panelGrid columns="3" layout="grid" columnClasses="ui-grid-col-1,ui-grid-col-6,ui-grid-col-2">
+                            <p:outputLabel value="Atividade" for="atividadeNome"/>
+                            <p:inputText id="atividadeNome" required="true" value="#{admPropriedadesTarefaController.tarefaAtividade.descricao}"/>
+                            <p:commandButton value="Salvar"
+                                             update="dtAtividade,tabViewTarefa:atividadeNome,:atividadeID"
+                                             oncomplete="timeOut()"
+                                             icon="ui-icon-check"
+                                             style="width: auto"
+                                             action="#{admPropriedadesTarefaController.salvarAtividade}"
+                                             process=":atividadeID,tabViewTarefa:atividadeNome,@this"/>
+                        </p:panelGrid>
+                        <p:dataTable 
+                            paginator="true"                                                      
+                            rows="20"
+                            paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                            rowsPerPageTemplate="10,15,20"
+                            resizableColumns="true" 
+                            draggableColumns="true" 
+                            id="dtAtividade" 
+                            value="#{admPropriedadesTarefaController.tarefaAtividadeList}" 
+                            var="atividade" 
+                            style="margin-top: 10px">
+                            <p:column style="text-align:center;width:10%;" headerText="ID" priority="2">
+                                <h:outputText value="#{atividade.id}"/>
+                            </p:column>
+                            <p:column headerText="Descrição" priority="1">
+                                <h:outputText value="#{atividade.descricao}"/>
+                            </p:column>
+                            <p:column headerText="Ferramenta" style="text-align:center;width:10%;">                                                
+                                <p:commandButton  style="width: 30px" icon="ui-icon-trash" 
+                                                  process="@this" 
+                                                  action="#{admPropriedadesTarefaController.deletarAtividade}" 
+                                                  update="tabViewTarefa:dtAtividade,:atividadeID,tabViewTarefa:atividadeNome" >
+                                    <f:setPropertyActionListener value="#{atividade.id}" target="#{admPropriedadesTarefaController.tarefaAtividade.id}" />
+                                </p:commandButton>
+                                <span style="padding-left:4px"></span>                               
+                                <p:commandButton  style="width: 30px"  icon="ui-icon-pencil" process="@this" update="tabViewTarefa:atividadeNome,:atividadeID">
+                                    <f:setPropertyActionListener value="#{atividade}" target="#{admPropriedadesTarefaController.tarefaAtividade}" />
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                    </p:tab>                    
+                </p:tabView>
+            </div>
+        </h:form>        
+    </ui:define>
+</ui:composition>

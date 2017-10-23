@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/template/layout.xhtml">
+
+    <ui:define name="corpo">                   
+        <f:metadata>
+            <f:viewParam name="usuario" />
+            <f:viewAction action="#{pessoaController.init}"/>
+            <!--<f:event listener="" type="preRenderView" />-->
+        </f:metadata>
+
+        <h:form id="formBuscaAtendimento" prependId="false">
+            <p:toolbar id="tb" styleClass="nj-toolbar">
+                <p:toolbarGroup align="left">
+                    <p:outputLabel style="padding-top: 5px; font-weight: 500; font-size: 1.3em; font-weight: bold; display: table-cell; vertical-align: middle; ">
+                        <i class="fa fa-fw fa-save" style="color: #2db994; font-size: 15px; margin-left: 10px; margin-right: 5px"></i>Clientes
+                    </p:outputLabel>
+                </p:toolbarGroup>                
+            </p:toolbar>
+            <p:messages id="messages" showDetail="false" autoUpdate="true" closable="true"/>
+            <p:sticky target="tb" />
+            <div style="margin-top: 7px;">
+                <div class="ui-fluid">
+
+                    <p:accordionPanel styleClass="ui-widget-header" id="acordionLocalizarAtendimento">                                
+                        <p:tab title="Filtros">
+                            <p:panelGrid columns="4" layout="grid"
+                                         style="text-align: right"
+                                         styleClass="ui-responsive panelgrid-noborder"
+                                         columnClasses="ui-grid-col-1, ui-grid-col-5,ui-grid-col-1,ui-grid-col-5">
+
+                                <p:outputLabel value="Nome Fantasia" for="nomeFantasia" />
+                                <p:inputText id="nomeFantasia" value="#{pessoaController.nomeFantasia}" />
+                                <p:outputLabel value="Nome" for="nome" />
+                                <p:inputText id="nome" value="#{pessoaController.nome}" />
+
+                                <p:outputLabel value="Cód" for="codigo" />
+                                <p:inputText id="codigo" value="#{pessoaController.id}" />
+                                <p:outputLabel value="Email" for="email" />
+                                <p:inputText id="email" value="#{pessoaController.email}" />
+
+                                <p:outputLabel value="Inscr Estadual" for="ie" />
+                                <p:inputText id="ie" value="#{pessoaController.ie}" />
+                                <p:outputLabel value="Cnpj/Cpf" for="cnpj" />
+                                <p:inputText id="cnpj" value="#{pessoaController.cnpj}" />
+
+                                <p:outputLabel value="Status" for="sitTopico" />
+                                <p:selectOneRadio id="sitTopico" value="#{pessoaController.status}" >
+                                    <f:selectItem itemLabel="Ativo" itemValue="true" />
+                                    <f:selectItem itemLabel="Inativo" itemValue="false" />                                
+                                </p:selectOneRadio>
+                                <p:outputLabel/>
+                                <p:outputLabel/>
+
+                                <p:outputLabel/>
+                                <p:outputLabel/>
+                                <p:outputLabel/>
+                                <p:outputLabel/>
+
+                                <p:outputLabel/>
+                                <p:outputLabel/>
+                                <p:outputLabel/>                            
+                                <h:panelGroup style="text-align: right">
+                                    <div style="text-align: right">
+                                        <p:commandButton 
+                                            value="Pesquisar"
+                                            process="@this,nomeFantasia,nome,codigo,email,ie,cnpj,sitTopico"
+                                            update="dtListaAtendimento"
+                                            icon="fa fa-fw fa-search" 
+                                            style="max-width: 100px; max-height: 40px;" />
+                                        <p:button value="Limpar" icon="fa fa-fw fa-eraser" style="max-width: 100px; max-height: 40px; margin-left: 10px" />
+                                    </div>
+                                </h:panelGroup>
+                            </p:panelGrid>
+                        </p:tab>
+                    </p:accordionPanel>                        
+
+                    <p:dataTable 
+                        id="dtListaAtendimento"
+                        paginator="true"                                                      
+                        rows="20"
+                        paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                        rowsPerPageTemplate="10,15,20"
+                        resizableColumns="true"
+                        draggableColumns="true"
+                        value="#{pessoaController.model}" 
+                        lazy="true"
+                        var="cliente" 
+                        rowIndexVar="rowIndex"
+                        style="margin-top: 10px;"                                
+                        emptyMessage="Nenhum cliente localizado!" >
+                        <f:facet name="header">
+                            <div style="text-align: left">TOTAL: #{pessoaController.totalPessoa}</div>
+                        </f:facet>                       
+                        <p:column style="width:4px" priority="7">                                    
+                            <p:rowToggler/>
+                        </p:column>
+                        <p:column style="text-align:center;width:3%;" headerText="#" priority="8">
+                            #{rowIndex + 1}
+                        </p:column>
+                        <p:column style="text-align:center;width:3%;" 
+                                  headerText="Cód" 
+                                  priority="3"                                           
+                                  sortBy="#{cliente.id}">
+                            <h:outputText value="#{cliente.id}"/>
+                        </p:column>                      
+                        <p:column style="width:50%;" 
+                                  headerText="Cliente - Nome Fantasia" 
+                                  priority="1"                                           
+                                  sortBy="#{cliente.nomeFantasia}"
+                                  filterBy="#{cliente.nomeFantasia}">
+                            <h:outputText value="#{cliente.nomeFantasia}"/>
+                        </p:column>
+                        <p:rowExpansion>                                        
+                            <p:dataTable
+                                style="margin-top: 10px; margin-bottom: 10px;" 
+                                resizableColumns="true"
+                                draggableColumns="true"                                
+                                var="anotacao"
+                                emptyMessage="Nenhuma anotação cadastrada!">                                
+                            </p:dataTable>
+                        </p:rowExpansion>
+                    </p:dataTable>
+                </div>
+            </div>
+        </h:form>        
+    </ui:define>
+</ui:composition>

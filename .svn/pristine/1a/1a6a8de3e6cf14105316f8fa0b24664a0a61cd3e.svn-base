@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/template/layout.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="corpo">
+        <f:metadata>            
+            <f:viewParam name="usuario" />
+            <f:viewAction action="#{atendimentoSuporteController.init}"/>
+            <!--<f:event listener="" type="preRenderView" />-->
+        </f:metadata>
+
+        <h:form prependId="false" id="formAtendimento">                     
+            <p:toolbar id="tb" styleClass="nj-toolbar">
+                <p:toolbarGroup align="left">
+                    <p:outputLabel style="padding-top: 5px; font-weight: 500; font-size: 1.3em; font-weight: bold; display: table-cell; vertical-align: middle;">
+                        <i class="fa fa-fw fa-save" style="color: #2db994; font-size: 15px; margin-left: 10px; margin-right: 5px"></i>Cadastrar Atendimento
+                    </p:outputLabel>                    
+                </p:toolbarGroup>
+                <p:toolbarGroup align="right">
+                    <p:clock pattern="HH:mm:ss"/>
+                    <p:commandButton value="Salvar" 
+                                     style="margin-right: 15px" 
+                                     oncomplete="timeOut()"                                                                          
+                                     process="@this,tabViewAtendimento:relatoCliente,tabViewAtendimento:providencias,tabViewAtendimento:obs,tabViewAtendimento:enviarParaAnalise,tabViewAtendimento:falouCom,tabViewAtendimento:acordionEvento:checkboxDT"
+                                     icon="ui-icon-check" action="#{atendimentoSuporteController.salvar}" />                    
+                </p:toolbarGroup>
+            </p:toolbar>
+            <p:messages id="messages" showDetail="false" autoUpdate="true" closable="true"/>
+            <p:sticky target="tb" />
+            <div style="margin-top: 7px;"> 
+                <div class="ui-fluid">                    
+                    <p:tabView id="tabViewAtendimento" style="margin-top: 5px;" activeIndex="#{atendimentoSuporteController.i}" effect="fade" dynamic="true">
+
+                        <!-- ################################### P E S Q U I S A R ################################### -->
+
+                        <p:tab title="Pesquisa">
+
+                            <p:panel id="meusAtendimentos" header="Meus Atendimentos" toggleable="true" closable="true" toggleSpeed="500" closeSpeed="500" widgetVar="meusAtendimentos" 
+                                     style="margin-bottom:20px; border-color:#d9534f !important;">
+                                <p:panelGrid columns="4"
+                                             id="root"
+                                             layout="grid"                                
+                                             styleClass="ui-responsive panelgrid-noborder"
+                                             columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-3,ui-grid-col-3">
+                                    <c:forEach var="myAtendimento" items="#{atendimentoSuporteController.myAtendimentoList}">                                                                                                                        
+                                        <div onclick="atender(#{myAtendimento.id})" class="#{myAtendimento.status.statusColor} w3-hover-shadow w3-padding-64 w3-center">
+                                            #{myAtendimento.id} -
+                                            #{myAtendimento.status.descricao} <br/>
+                                            #{myAtendimento.cliente.nomeFantasia}
+                                        </div>                              
+                                    </c:forEach>
+                                    <p:remoteCommand name="jsToBean" actionListener="#{atendimentoSuporteController.selecionarAtendimento}" update="tabViewAtendimento"/>
+                                </p:panelGrid>
+                            </p:panel>
+
+                            <p:panel id="semAtendentes" header="Sem Atendentes" toggleable="true" closable="true" toggleSpeed="500" closeSpeed="500" widgetVar="semAtendentes" 
+                                     style="margin-bottom:20px;border-color: #5cb85c;">
+                                <p:panelGrid columns="4" layout="grid"
+                                             style="text-align: right"
+                                             styleClass="ui-responsive panelgrid-noborder"
+                                             columnClasses="ui-grid-col-3, ui-grid-col-3,ui-grid-col-3,ui-grid-col-3">
+                                    <c:forEach var="oursAtendimento" items="#{atendimentoSuporteController.oursAtendimentoList}">
+                                        <div onclick="atender(#{oursAtendimento.id})" class="w3-blue w3-hover-shadow w3-padding-64 w3-center">                                        
+                                            #{oursAtendimento.id} - 
+                                            #{oursAtendimento.status.descricao}
+                                        </div>
+                                    </c:forEach>                                
+                                </p:panelGrid>
+                            </p:panel>
+
+                            <p:panel id="demaisAtendimentos" header="Demais Atendimentos" toggleable="true" closable="true" toggleSpeed="500" closeSpeed="500" widgetVar="demaisAtendimentos" 
+                                     style="margin-bottom:20px;border-color: #f0ad4e; ">
+                                <p:panelGrid columns="4" layout="grid"
+                                             style="text-align: right"
+                                             styleClass="ui-responsive panelgrid-noborder"
+                                             columnClasses="ui-grid-col-3, ui-grid-col-3,ui-grid-col-3,ui-grid-col-3">
+                                    <c:forEach var="theirAtendimento" items="#{atendimentoSuporteController.theirAtendimentoList}">
+                                        <div onclick="atender(#{theirAtendimento.id})" class="w3-blue w3-hover-shadow w3-padding-64 w3-center">                                        
+                                            #{theirAtendimento.id} - 
+                                            #{theirAtendimento.status.descricao}
+                                        </div>
+                                    </c:forEach>                                
+                                </p:panelGrid>
+                            </p:panel>
+                        </p:tab> 
+
+                        <!--################################################ A T E N D I M E N T O ################################################ -->
+
+                        <p:tab title="Atendimento" disabled="#{atendimentoSuporteController.desabilitado}">
+                            <p:panel  id="panelCliente"  header="Cliente" toggleable="true" closable="true" toggleSpeed="500" closeSpeed="500" widgetVar="panelCliente" style="margin-bottom:20px;">                                
+                                <p:layout style="min-width:400px;min-height:130px;margin-bottom: 0px !important">
+                                    <p:layoutUnit position="west" resizable="true" style="border: none !important;margin-bottom: 0px !important"  size="100" minSize="40"  maxSize="200">
+                                        <div class="ui-fluid">
+                                            <h:graphicImage style="width: 100%; height:100%;" library="img" name="img_avatar3.png" />
+                                        </div>
+                                    </p:layoutUnit>
+
+                                    <p:layoutUnit position="center" style="border: none !important;margin-bottom: 0px !important">
+                                        <p:panelGrid columns="2" columnClasses="ui-grid-col-1,ui-grid-col-11" layout="grid" styleClass="ui-panelgrid-blank" style="margin-bottom: 0px !important">
+                                            <p:outputLabel value="Nome" style="font-weight:bold;"/>
+                                            <p:outputLabel style="padding-left: 20px !important" value="#{atendimentoSuporteController.atendimento.cliente.nomeFantasia}"/>
+                                            <p:outputLabel value="Telefone" style="font-weight:bold"/>
+                                            
+                                            <h:panelGroup style="padding-left: 20px !important">
+                                                <c:forEach var="myAtendimento" items="#{atendimentoSuporteController.atendimento.cliente.telefone}">                                                                                                                        
+                                                    #{myAtendimento},                                                    
+                                                </c:forEach>
+                                            </h:panelGroup>
+                                            <p:outputLabel value="Endereço" style="font-weight:bold"/>
+                                            <p:outputLabel style="padding-left: 20px !important" 
+                                                           value="#{atendimentoSuporteController.atendimento.cliente.endereco.nomeRua},
+                                                           #{atendimentoSuporteController.atendimento.cliente.endereco.numero},
+                                                           #{atendimentoSuporteController.atendimento.cliente.endereco.cidade.nome} - 
+                                                           #{atendimentoSuporteController.atendimento.cliente.endereco.cidade.uf.nome},
+                                                           #{atendimentoSuporteController.atendimento.cliente.endereco.cep}"/>
+                                            <p:outputLabel value="Falar Com" style="font-weight:bold"/>
+                                            <p:outputLabel style="padding-left: 20px !important" value="#{atendimentoSuporteController.atendimento.falarCom}"/>
+                                        </p:panelGrid>
+                                    </p:layoutUnit>
+                                </p:layout>                                
+                            </p:panel>
+
+                            <p:accordionPanel activeIndex="-1" styleClass="ui-widget-header">                                
+                                <p:tab title="Anotações da Agenda">
+                                    <p:dataTable 
+                                        id="dtResultPesquisa"                                        
+                                        resizableColumns="true"
+                                        draggableColumns="true"
+                                        value="#{atendimentoSuporteController.anotacoesAgendaList}"                                        
+                                        var="anotacao"
+                                        rowIndexVar="rowIndex"
+                                        style="margin-top: 10px; margin-bottom:20px"
+                                        emptyMessage="Nenhum Atendimento cadastrado!" >
+                                        <p:column style="text-align:center;width:3%;" headerText="#" priority="3">
+                                            <h:outputText value="#{rowIndex + 1}" style="font-weight: 100"/>
+                                        </p:column>                                    
+                                        <p:column style="width:10%;text-align:center;" 
+                                                  headerText="Data/Hora" 
+                                                  sortBy="#{anotacao.dataAnotacao}"
+                                                  priority="2">
+                                            <h:outputText value="#{anotacao.dataAnotacao}" style="font-weight: 100">
+                                                <f:convertDateTime dateStyle="medium" pattern="dd/MM/yyyy"/>
+                                            </h:outputText> 
+                                            <br/>
+                                            <h:outputText value="#{anotacao.horaAnotacao}" style="font-weight: 100">
+                                                <f:convertDateTime dateStyle="medium" pattern="HH:mm:ss"/>
+                                            </h:outputText>
+                                        </p:column>                        
+                                        <p:column style="text-align:left;width:80%;" headerText="Descrição" priority="1">
+                                            <h:outputText value="#{anotacao.descricao}" style="font-weight: 100" />
+                                        </p:column>
+                                    </p:dataTable>
+                                </p:tab>                               
+                            </p:accordionPanel>
+
+                            <p:panel  id="panelRelatoCliente"
+                                      header="Relato do Cliente" 
+                                      toggleable="true" closable="true" 
+                                      toggleSpeed="500" closeSpeed="500" 
+                                      widgetVar="panelRelatoCliente" style="margin-bottom:20px; margin-top: 20px">
+                                <p:panelGrid columns="1" columnClasses="ui-grid-col-12" layout="grid" styleClass="ui-panelgrid-blank">                                    
+                                    <p:outputLabel value="O que acontece ? Quando acontece ? Como Acontece ? Tem Imagens ?" for="relatoCliente"/>
+                                    <p:inputTextarea id="relatoCliente" required="true" rows="5" cols="33" class="ui-fluid" value="#{atendimentoSuporteController.relatoCliente.descricao}" />
+                                </p:panelGrid>
+                            </p:panel>
+
+                            <p:panel  id="panelProvidencias" 
+                                      header="Providências" 
+                                      toggleable="true" 
+                                      closable="true" 
+                                      toggleSpeed="500" 
+                                      closeSpeed="500" widgetVar="panelProvidencias" style="margin-bottom:20px;">
+                                <p:panelGrid columns="1" columnClasses="ui-grid-col-12" layout="grid" styleClass="ui-panelgrid-blank">
+                                    <p:outputLabel value="O que foi feito ? o que foi alterado ? " for="providencias"/>
+                                    <p:inputTextarea id="providencias" required="true" rows="5" cols="33" class="ui-fluid" value="#{atendimentoSuporteController.providencias.descricao}" />
+                                </p:panelGrid>
+                            </p:panel>
+
+                            <p:panel id="anotacoesSuporte"  header="Anotações" toggleable="true" closable="true" toggleSpeed="500" closeSpeed="500" widgetVar="anotacoesSuporte" style="margin-bottom:20px;">
+                                <p:panelGrid columns="1" columnClasses="ui-grid-col-12" layout="grid" styleClass="ui-panelgrid-blank">                                    
+                                    <p:outputLabel value="Anotações diversas" for="providencias"/>
+                                    <p:inputTextarea id="obs" rows="5" cols="33" class="ui-fluid" value="#{atendimentoSuporteController.anotacaoSuporte.descricao}" />
+                                </p:panelGrid>
+                            </p:panel>
+
+                            <p:panel id="dadosAdicionais"  header="Dados Adicionais" toggleable="true" closable="true" toggleSpeed="500" closeSpeed="500" widgetVar="dadosAdicionais" style="margin-bottom:20px;">
+                                <p:panelGrid columns="3" columnClasses="ui-grid-col-3,ui-grid-col-3,ui-grid-col-6" layout="grid" styleClass="ui-panelgrid-blank">
+                                    <h:panelGroup>
+                                        <p:selectBooleanCheckbox id="enviarParaAnalise" value="#{atendimentoSuporteController.paraAnalise}"/>
+                                        <h:outputText value="Enviar para análise" style="margin-left: 10px;"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup>
+                                        <p:outputLabel value="Falou com ?" for="falouCom" style="margin-bottom: 25px !important"/>
+                                        <p:inputText id="falouCom" required="true" 
+                                                     value="#{atendimentoSuporteController.falouCom}" 
+                                                     placeholder="nome(s) separado(s) por vírgulas" style="margin-top:5px"/>
+                                    </h:panelGroup>
+                                </p:panelGrid>
+                            </p:panel>
+
+                            <p:accordionPanel activeIndex="-1" styleClass="ui-widget-header" id="acordionEvento">
+                                <p:tab title="Eventos" id="tabEvento">
+                                    <p:dataTable id="checkboxDT" 
+
+                                                 paginator="true"
+                                                 rows="20"
+                                                 paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                                 rowsPerPageTemplate="10,15,20"
+                                                 resizableColumns="true"
+                                                 draggableColumns="true"
+                                                 var="evento" 
+                                                 value="#{atendimentoSuporteController.eventoList}" 
+                                                 selection="#{atendimentoSuporteController.eventoSelectedList}"
+                                                 rowKey="#{evento.id}" style="margin-bottom:0">                                    
+                                        <p:column selectionMode="multiple" style="width:16px;text-align:center"/>                                        
+                                        <p:column headerText="Id" style="width: 3%; text-align: center">
+                                            <h:outputText value="#{evento.id}" />
+                                        </p:column>                                                              
+                                        <p:column headerText="Descricao">
+                                            <h:outputText value="#{evento.descricao}" />
+                                        </p:column>                                        
+                                    </p:dataTable>
+                                </p:tab>
+                            </p:accordionPanel>
+
+                            <p:accordionPanel activeIndex="-1" 
+                                              styleClass="ui-widget-header"
+                                              style="margin-bottom:20px; margin-top: 20px;"
+                                              id="acordionUpload">
+                                <p:tab title="Anexar arquivos" id="tabUpload">
+                                    <p:toolbar>
+                                        <f:facet name="left">
+                                            <p:fileUpload label="Procurar" 
+                                                          style="min-width: 300px; text-align:left;"
+                                                          oncomplete="timeOut()"
+                                                          id="fileUpload"
+                                                          update="dtAnexos"
+                                                          auto="true"
+                                                          allowTypes="/(\.|\/)(gif|jpe?g|png|pdf)$/"
+                                                          sizeLimit="100000"
+                                                          fileLimit="3"
+                                                          cancelLabel ="Cancelar"
+                                                          uploadLabel="Enviar"
+                                                          dragDropSupport="true"
+                                                          fileLimitMessage="Envie no máximo 3 arquivos"
+                                                          fileUploadListener="#{atendimentoSuporteController.handleFileUpload}" />                                                                                     
+                                        </f:facet>                                        
+                                    </p:toolbar>  
+                                    <p:dataTable                                     
+                                        resizableColumns="true" 
+                                        draggableColumns="true"                                    
+                                        id="dtAnexos"                                         
+                                        editable="true" 
+                                        editMode="cell"
+                                        value="#{atendimentoSuporteController.anexosList}"                                        
+                                        var="anexo"
+                                        style="margin-top: 10px" 
+                                        rowIndexVar="rowIndex"
+                                        emptyMessage="Nenhum anexo cadastrado!" >
+
+                                        <p:column style="text-align:center;width:30%;" headerText="#" priority="1">
+                                            #{rowIndex + 1}
+                                        </p:column>
+                                        <p:column style="text-align:center;width:30%;" headerText="Nome" priority="2">
+                                            #{anexo.nomeFantasia}
+                                        </p:column>
+                                        <p:column style="text-align:center;width:30%;" headerText="Descrição" priority="2">
+                                            #{anexo.descricao}
+                                        </p:column>
+                                        <p:column style="text-align:center;width:30%;" headerText="Apagar" priority="2">
+                                            <p:commandButton  style="width: 30px;"
+                                                              icon="ui-icon-trash"
+                                                              process="@this" 
+                                                              update="dtAnexos"
+                                                              action="#{atendimentoSuporteController.deletarAnexo}">
+                                                <f:setPropertyActionListener value="#{anexo}" target="#{atendimentoSuporteController.anexo}" />
+                                            </p:commandButton>
+                                        </p:column>
+                                    </p:dataTable>
+                                </p:tab>
+                            </p:accordionPanel>
+
+                            <div style="text-align: right; width: 100%">
+
+                                <p:commandButton value="Salvar"
+                                                 id="subir"
+                                                 oncomplete="timeOut(),subir()"
+                                                 icon="ui-icon-check" 
+                                                 process="@this,relatoCliente,providencias,obs,enviarParaAnalise,falouCom,tabViewAtendimento:acordionEvento:checkboxDT"
+                                                 update="formAtendimento"
+                                                 style="max-width: 100px; max-height: 40px;" 
+                                                 action="#{atendimentoSuporteController.salvar}"/>
+
+                                <p:button value="Limpar" icon="fa fa-fw fa-eraser" style="max-width: 100px; max-height: 40px; margin-left: 10px" />
+
+                            </div>
+                        </p:tab>
+                    </p:tabView>  
+                </div>
+            </div>            
+
+            <script>
+                function atender(id) {
+                    jsToBean([{name: 'id', value: id}]);
+                }
+            </script>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,97 @@
+/* TOGGLE ALTERNAR SIMBOLO DO MENU DA DIREITA */
+.nj-toggle {
+    float: right;
+    line-height: 50px;
+    margin-right: 15px;	
+    color: #373737;
+}
+
+.nj-toolbar {
+    margin-right: 0px;
+    margin-top: 60px; 
+    min-height: 32px;
+    padding-top: 7px; 
+    padding-bottom: 7px;       
+}
+
+/*MENU*/
+.nj-menu {
+    font-size: 1.2em;    
+}
+
+.nj-menu > ul {
+    margin-top: -7px;
+    padding: 0;
+    list-style: nome;    
+}
+
+.nj-menu > ul a {
+    display: block;
+    padding: 10px 15px;
+    text-decoration: none;
+    font-weight: 500;
+    color: #373737;
+}
+
+.nj-menu > ul i {
+    margin-right: 6px;
+    color: #2db994;
+    font-size: 1.2em;
+}
+
+.nj-menu > ul a:hover, .nj-menu > ul a:focus {
+    background-color: #dfdfdf;
+}
+
+.nj-menu > ul .is-selected {
+    border-left: 3px solid #1e49d2;
+    background-color: #f3f3f3;
+}
+
+.nj-menu > ul .is-selected a {
+    border-left: -3px;
+    color: #1e49d2;
+}
+
+/*TITULO DAS PAGINAS*/
+.nj-page-title {   
+    background-color: #F6F7F8; 
+    margin: 0; 
+    margin-top: 65px;  
+    min-height: 50px; 
+    border-bottom: 1px solid #d3d6db; 
+    display: table; 
+    width: 100%;
+}
+
+.nj-page-title > p {
+    font-size: 1.3em; 
+    font-weight: bold; 
+    display: table-cell;
+    vertical-align: middle; 
+    padding: 8px;
+}
+
+.nj-page-title > p > i {
+    color: #2db994; 
+    font-size: 18px;
+}
+
+.nj-menu-prime {
+    font-size: 1em;   
+}
+
+.ui-menuitem-text {
+    font-size: 0.9em;
+}
+
+.ui-button {
+    left: 7px;
+    height: 31px !important;
+    right: 100px;
+    margin-right: 7px !important;
+}
+
+#frmSelecaoProduto{
+    margin-top: 50px;    
+}

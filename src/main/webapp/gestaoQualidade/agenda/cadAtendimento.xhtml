@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/template/layout.xhtml">
+
+    <ui:define name="corpo">                   
+        <f:metadata>
+            <f:viewParam name="usuario" />
+            <f:viewAction action="#{cadAtendimentoController.init}"/>
+            <!--<f:event listener="" type="preRenderView" />-->
+        </f:metadata>
+
+        <h:form prependId="false">         
+            <h:inputHidden id="atendimentoId" value="#{cadAtendimentoController.atendimento.id}"/>
+            <p:toolbar id="tb" styleClass="nj-toolbar">
+                <p:toolbarGroup align="left">
+                    <p:outputLabel style="padding-top: 5px; font-weight: 500; font-size: 1.3em; font-weight: bold; display: table-cell; vertical-align: middle; ">
+                        <i class="fa fa-fw fa-save" style="color: #2db994; font-size: 15px; margin-left: 10px; margin-right: 5px"></i>Cadastrar Atendimento
+                    </p:outputLabel>                    
+                </p:toolbarGroup>                                 
+            </p:toolbar>
+
+            <p:messages id="messages" showDetail="false" autoUpdate="true" closable="true"/>
+            <p:sticky target="tb" />
+            <div style="margin-top: 7px;"> 
+                <div class="ui-fluid">                    
+                    <p:tabView id="tabViewTarefa" style="margin-top: 5px;" activeIndex="#{cadAtendimentoController.i}" effect="fade">
+
+                        <!-- ################################### P E S Q U I S A R ################################### -->
+
+                        <p:tab title="Pesquisa">
+
+                            <p:accordionPanel activeIndex="-1" styleClass="ui-widget-header" id="acordionLocalizarAtendimento">                                
+                                <p:tab title="Localizar">
+                                    <p:panelGrid columns="4" layout="grid"
+                                                 styleClass="ui-responsive panelgrid-noborder"
+                                                 style="text-align: right"
+                                                 columnClasses="ui-grid-col-1, ui-grid-col-5,ui-grid-col-1,ui-grid-col-5">
+                                        <p:outputLabel value="Cliente" for="clienteBusca" />
+                                        <p:selectOneMenu id="clienteBusca"                                                                                           
+                                                         value="#{cadAtendimentoController.cliente}" 
+                                                         effect="fade"                                                 
+                                                         var="c"
+                                                         converter="pessoaConverter"
+                                                         filter="true"   
+                                                         class="oneMenuCliente"
+                                                         style="width: 100%"
+                                                         filterMatchMode="startsWith" > 
+                                            <f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+                                            <f:selectItems value="#{cadAtendimentoController.clienteList}" var="client" itemLabel="#{client.nomeFantasia}" itemValue="#{client}" />
+                                            <p:column>
+                                                <h:outputText value="#{c.nomeFantasia}" />
+                                            </p:column>
+                                        </p:selectOneMenu>
+
+                                        <p:outputLabel value="Analista" for="atendenteBusca" />
+                                        <p:selectOneMenu id="atendenteBusca" value="#{cadAtendimentoController.atendente}" >
+                                            <f:selectItem itemLabel="Selecione" noSelectionOption="true"/>
+                                            <f:selectItems value="#{cadAtendimentoController.atendenteList}" var="atend" itemValue="#{atend}" itemLabel="#{atend.primeiroNome}"/>
+                                        </p:selectOneMenu> 
+
+                                        <p:outputLabel for="dtInicioBusca" value="Dt Inicio" />
+                                        <p:calendar id="dtInicioBusca" locale="de" value="#{cadAtendimentoController.dtInicioAtendimento}" maxdate="#{cadAtendimentoController.dtMax}" navigator="true" pattern="dd/MM/yyyy" mask="true" />
+
+                                        <p:outputLabel for="dtFimBusca" value="Dt Fim" />
+                                        <p:calendar id="dtFimBusca" locale="de" value="#{cadAtendimentoController.dtFimAtendimento}" maxdate="#{cadAtendimentoController.dtMax}" navigator="true" pattern="dd/MM/yyyy" mask="true"/>
+
+                                        <p:outputLabel value="Status" for="status" />
+                                        <p:selectOneMenu id="status" value="#{cadAtendimentoController.status}" >
+                                            <f:selectItem itemLabel="Todos" itemValue=""/>
+                                            <f:selectItems value="#{cadAtendimentoController.atendimentoStatus}"  var="status" itemValue="#{status}" itemLabel="#{status.descricao}"/>
+                                        </p:selectOneMenu>
+
+                                        <p:outputLabel value="Cód" for="codigo" />
+                                        <p:inputText id="codigo" value="#{cadAtendimentoController.id}" />
+
+                                        <p:outputLabel/>
+                                        <p:outputLabel/>
+                                        <p:outputLabel/>
+                                        <h:panelGroup style="text-align: right">
+                                            <div style="text-align: right">
+                                                <p:commandButton value="Pesquisar" 
+                                                                 process="@this,clienteBusca,atendenteBusca,dtInicioBusca,dtFimBusca,status,codigo" 
+                                                                 update="tabViewTarefa:dtResultPesquisa"
+                                                                 icon="fa fa-fw fa-search"                                                                  
+                                                                 style="max-width: 100px; max-height: 40px;"/>
+                                                <p:button value="Limpar" icon="fa fa-fw fa-eraser" style="max-width: 100px; max-height: 40px; margin-left: 10px" />
+                                            </div>
+                                        </h:panelGroup>                     
+                                    </p:panelGrid>
+                                </p:tab>
+                            </p:accordionPanel>
+                            <p:dataTable 
+                                id="dtResultPesquisa"
+                                paginator="true"
+                                rows="20"
+                                paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                rowsPerPageTemplate="10,15,20"
+                                resizableColumns="true"
+                                draggableColumns="true"
+                                value="#{cadAtendimentoController.model}" 
+                                lazy="true"
+                                var="atendimento"
+                                rowIndexVar="rowIndex"
+                                style="margin-top: 10px" 
+                                emptyMessage="Nenhum Atendimento cadastrado!" >                                
+                                <f:facet name="header">
+                                    <div style="text-align: left">TOTAL: #{cadAtendimentoController.totalAtendimento}</div>
+                                </f:facet>
+                                <p:column style="width:4px" priority="4">
+                                    <p:rowToggler rendered="#{atendimento.anotacoes.size() > 0}"/>
+                                </p:column>
+                                <p:column style="text-align:center;width:3%;" headerText="#" priority="8">
+                                    #{rowIndex + 1}
+                                </p:column>
+                                <p:column style="text-align:center;width:5%;" 
+                                          sortBy="#{atendimento.id}"
+                                          headerText="Cód" priority="3">
+                                    <h:outputText value="#{atendimento.id}"/>
+                                </p:column>
+                                <p:column style="width:10%;text-align:center;" 
+                                          headerText="Data/Hora" 
+                                          sortBy="#{atendimento.dataAtendimento}"
+                                          priority="1">
+                                    <h:outputText value="#{atendimento.dataAtendimento}">
+                                        <f:convertDateTime dateStyle="medium" pattern="dd/MM/yyyy"/>
+                                    </h:outputText> 
+                                    <br/>
+                                    <h:outputText value="#{atendimento.horaAtendimento}">
+                                        <f:convertDateTime dateStyle="medium" pattern="HH:mm:ss"/>
+                                    </h:outputText>
+                                </p:column>                        
+                                <p:column style="width:50%;" 
+                                          headerText="Cliente - Nome Fantasia" 
+                                          sortBy="#{atendimento.cliente.nomeFantasia}"
+                                          filterBy="#{atendimento.cliente.nomeFantasia}"
+                                          priority="1">
+                                    <h:outputText value="#{atendimento.cliente.nomeFantasia}"/>                            
+                                </p:column>
+                                <p:column style="width:8%;" 
+                                          headerText="Falar C"                                           
+                                          sortBy="#{atendimento.falarCom}"
+                                          priority="1">
+                                    <h:outputText value="#{atendimento.falarCom}"/>
+                                </p:column>
+                                <p:column style="width:8%;" 
+                                          headerText="Analista" 
+                                          filterBy="#{atendimento.atendente.primeiroNome}"
+                                          sortBy="#{atendimento.atendente.primeiroNome}"
+                                          priority="1">
+                                    <h:outputText value="#{atendimento.atendente.primeiroNome}"/>
+                                </p:column>
+                                <p:column style="width:8%;" 
+                                          styleClass="#{atendimento.status.statusColor}"
+                                          headerText="Status" 
+                                          filterBy="#{atendimento.status}"
+                                          sortBy="#{atendimento.status}"
+                                          priority="1">
+                                    <h:outputText value="#{atendimento.status.descricao}"/>
+                                </p:column>                                 
+                                <p:rowExpansion>
+                                    <p:dataTable
+                                        style="margin-top: 10px; margin-bottom: 10px;" 
+                                        resizableColumns="true"
+                                        draggableColumns="true"
+                                        value="#{cadAtendimentoController.anotacoesPorId(atendimento)}" 
+                                        var="anotacao"
+                                        emptyMessage="Nenhuma anotação cadastrada!">
+                                        <p:column style="text-align:center;width:10%;" headerText="Responsável" priority="3">
+                                            <h:outputText value="#{anotacao.atendente.primeiroNome}"/>
+                                        </p:column>
+                                        <p:column style="text-align:center;width:10%;" headerText="DT/H" priority="3">
+                                            <h:outputText value="#{anotacao.dataAnotacao}">
+                                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                            </h:outputText>
+                                            <br/>
+                                            <h:outputText value="#{anotacao.horaAnotacao}"/>
+                                        </p:column>
+                                        <p:column style="text-align:center;width:70%;" headerText="Descrição" priority="3">
+                                            <h:outputText value="#{anotacao.descricao}"/>
+                                        </p:column>
+                                        <p:column style="text-align:center;width:10%;" headerText="Falou Com" priority="3">
+                                            <h:outputText value="#{anotacao.falouCom}"/>
+                                        </p:column>
+                                    </p:dataTable>                                    
+                                </p:rowExpansion>
+                            </p:dataTable> 
+                        </p:tab>
+
+                        <!--################################### C A D A S T R O ################################### -->
+
+                        <p:tab title="Cadastro">
+                            <p:panel id="panelFiltros" header="Filtros" toggleable="true" closable="true" toggleSpeed="500" closeSpeed="500" widgetVar="panelFiltros" style="margin-bottom:20px;">                                
+                                <h:panelGroup id="pgAtendimento" >                                
+                                    <p:panelGrid columns="4"
+                                                 layout="grid"
+                                                 style="text-align: right"
+                                                 styleClass="ui-responsive panelgrid-noborder"                                             
+                                                 columnClasses="ui-grid-col-1, ui-grid-col-5,ui-grid-col-1,ui-grid-col-5">
+
+                                        <p:outputLabel value="Cliente" for="cliente" />
+                                        <p:selectOneMenu id="cliente"
+                                                         required="true"
+                                                         value="#{cadAtendimentoController.atendimento.cliente}"
+                                                         converter="pessoaConverter"
+                                                         effect="fade"
+                                                         var="c" 
+                                                         filter="true"   
+                                                         class="oneMenuCliente"
+                                                         style="width: 100%"
+                                                         filterMatchMode="startsWith" > 
+                                            <f:selectItem itemLabel="Selecione" noSelectionOption="true" />
+                                            <f:selectItems value="#{cadAtendimentoController.clienteList}" var="client" itemLabel="#{client.nomeFantasia}" itemValue="#{client}" />
+                                            <p:column>
+                                                <h:outputText value="#{c.nomeFantasia}" />
+                                            </p:column>
+                                        </p:selectOneMenu>
+
+                                        <p:outputLabel value="Analista" for="atendente" />
+                                        <p:selectOneMenu id="atendente"                                                      
+                                                         value="#{cadAtendimentoController.atendimento.atendente}" >
+                                            <f:selectItem itemLabel="Selecione"  noSelectionOption="true"/>
+                                            <f:selectItems value="#{cadAtendimentoController.atendenteList}" 
+                                                           var="atend" 
+                                                           itemValue="#{atend}" 
+                                                           itemLabel="#{atend.primeiroNome} - #{atend.emAtendimento == true ? 'ocupado' : 'LIVRE'}"/>
+                                        </p:selectOneMenu> 
+
+                                        <p:outputLabel value="Obs" for="obs" />   
+                                        <p:inputTextarea id="obs" rows="6" cols="33" class="ui-fluid" value="#{cadAtendimentoController.anotacao.descricao}" />
+
+                                        <p:outputLabel value="Falar com ?" for="falarCom"/>
+                                        <p:inputText id="falarCom" value="#{cadAtendimentoController.atendimento.falarCom}" />
+
+                                        <p:outputLabel/>
+                                        <p:outputLabel/>
+                                        <p:outputLabel/>
+                                        <h:panelGroup style="text-align: right">
+                                            <div style="text-align: right">
+                                                <p:commandButton value="Salvar" 
+                                                                 process="@this,cliente,atendente,obs,falarCom" 
+                                                                 update="pgAtendimento, dtAtendimento,dtResultPesquisa"
+                                                                 icon="ui-icon-check" 
+                                                                 oncomplete="timeOut()"
+                                                                 style="max-width: 100px; max-height: 40px;" 
+                                                                 action="#{cadAtendimentoController.salvar}"/>                                                
+                                                <p:button value="Limpar" icon="fa fa-fw fa-eraser" style="max-width: 100px; max-height: 40px; margin-left: 10px" />
+                                            </div>
+                                        </h:panelGroup>                     
+                                    </p:panelGrid>                                
+                                </h:panelGroup>  
+                            </p:panel>
+                            <div class="ui-fluid">
+                                <p:dataTable                                     
+                                    paginator="true"                                                      
+                                    rows="20"
+                                    paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                    rowsPerPageTemplate="10,15,20"
+                                    resizableColumns="true" 
+                                    draggableColumns="true"                                    
+                                    id="dtAtendimento" 
+                                    value="#{cadAtendimentoController.model}" 
+                                    lazy="true"
+                                    var="atendimento" 
+                                    style="margin-top: 10px" 
+                                    rowIndexVar="rowIndex"
+                                    emptyMessage="Nenhum Atendimento cadastrado!" >
+                                    <f:facet name="header">
+                                        <div style="text-align: left"> TOTAL: #{cadAtendimentoController.totalAtendimento} </div>
+                                    </f:facet>
+                                    <p:column style="width:4px" priority="7">
+                                        <p:rowToggler rendered="#{atendimento.anotacoes.size() > 0}"/>
+                                    </p:column>
+                                    <p:column style="text-align:center;width:3%;"                                               
+                                              headerText="#" priority="6">
+                                        #{rowIndex + 1}
+                                    </p:column>
+                                    <p:column style="text-align:center;width:5%;" 
+                                              sortBy="#{atendimento.id}"
+                                              headerText="Cód" priority="5">
+                                        <h:outputText value="#{atendimento.id}"/>
+                                    </p:column>
+                                    <p:column 
+                                        style="text-align:center;width:8%;"
+                                        sortBy="#{atendimento.dataAtendimento}"
+                                        headerText="Data/Hora" priority="4">
+                                        <h:outputText value="#{atendimento.dataAtendimento}">                            
+                                            <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                        </h:outputText>
+                                        <br/>
+                                        <h:outputText value="#{atendimento.horaAtendimento}">                            
+                                            <f:convertDateTime pattern="HH:mm:ss "/>
+                                        </h:outputText>
+                                    </p:column>                        
+                                    <p:column style="width:50%;" headerText="Cliente" 
+                                              sortBy="#{atendimento.cliente.nomeFantasia}" 
+                                              filterBy="#{atendimento.cliente.nomeFantasia}"
+                                              priority="1">
+                                        <h:outputText value="#{atendimento.cliente.nomeFantasia}"/>
+                                    </p:column>
+                                    <p:column style="width:10%;" 
+                                              headerText="Falar C" 
+                                              sortBy="#{atendimento.falarCom}"                                               
+                                              priority="3">
+                                        <h:outputText value="#{atendimento.falarCom}"/>
+                                    </p:column>
+                                    <p:column style="width:7%;" 
+                                              headerText="Analista" 
+                                              sortBy="#{atendimento.atendente.primeiroNome}" 
+                                              filterBy="#{atendimento.atendente.primeiroNome}"
+                                              priority="3">
+                                        <h:outputText value="#{atendimento.atendente.primeiroNome}"/>
+                                    </p:column>
+                                    <p:column style="width:7%;text-align: center;"
+                                              styleClass="#{atendimento.status.statusColor}"
+                                              headerText="Status" 
+                                              sortBy="#{atendimento.status}"                                              
+                                              filterBy="#{atendimento.status}"
+                                              priority="2">
+                                        <h:outputText value="#{atendimento.status.descricao}"/>
+                                    </p:column> 
+
+                                    <p:rowExpansion>                                        
+                                        <p:dataTable
+                                            style="margin-top: 10px; margin-bottom: 10px;" 
+                                            resizableColumns="true"
+                                            draggableColumns="true"
+                                            value="#{cadAtendimentoController.anotacoesPorId(atendimento)}" 
+                                            var="anotacao"
+                                            emptyMessage="Nenhuma anotação cadastrada!">
+                                            <p:column style="text-align:center;width:10%;" headerText="Responsável" priority="3">
+                                                <h:outputText value="#{anotacao.atendente.primeiroNome}"/>
+                                            </p:column>
+                                            <p:column style="text-align:center;width:10%;" headerText="DT/H" priority="3">
+                                                <h:outputText value="#{anotacao.dataAnotacao}">
+                                                    <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                                </h:outputText>
+                                                <br/>
+                                                <h:outputText value="#{anotacao.horaAnotacao}"/>
+                                            </p:column>
+                                            <p:column style="text-align:center;width:70%;" headerText="Descrição" priority="3">
+                                                <h:outputText value="#{anotacao.descricao}"/>
+                                            </p:column>                                            
+                                            <p:column style="text-align:center;width:10%;" headerText="Falou Com" priority="3">
+                                                <h:outputText value="#{anotacao.falouCom}"/>
+                                            </p:column>
+                                        </p:dataTable>
+                                    </p:rowExpansion>
+
+                                </p:dataTable> 
+                            </div>
+                        </p:tab>
+
+                    </p:tabView>  
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <meta charset="UTF-8"/>
+        <f:metadata >
+            <f:viewAction action="#{selecaoProdutoBean.inicializar}" />
+        </f:metadata>
+        <title>Seleção de produto</title>
+        <h:outputStylesheet library="style" name="estilo.css"/>                
+    </h:head>                
+    <h:body>
+        <h:form id="frmSelecaoProduto">
+            <div style="margin-top: 5px; margin-bottom: 20px">
+                <p:inputText id="nome" size="40" value="#{selecaoProdutoBean.nome}" placeholder="Nome do Produto" />
+
+                <p:spacer width="10px"/>
+
+                <p:commandButton value="Pesquisar" action="#{selecaoProdutoBean.pesquisar}" update="@form" />                                                    
+            </div>    
+
+            <p:dataTable value="#{selecaoProdutoBean.produtosFiltrados}" var="produto"
+                         emptyMessage="Nenhum Produto encontrado." rows="10"
+                         paginator="true" paginatorAlwaysVisible="false" paginatorPosition="bottom">
+
+                <p:column headerText="Codigo">
+                    <h:outputText value="#{produto.codigoProduto}" />                    
+                </p:column>
+
+
+                <p:column headerText="Nome">
+                    <h:outputText value="#{produto.nome}" />                    
+                </p:column>
+
+                <p:column style="width: 30px; text-align: center">
+                    <p:commandButton icon="ui-icon-check" title="Selecionar"
+                                     action="#{selecaoProdutoBean.selecionar(produto)}"
+                                     process="@this" />
+
+                </p:column>
+
+            </p:dataTable>
+
+        </h:form>
+    </h:body>
+
+</ui:composition>

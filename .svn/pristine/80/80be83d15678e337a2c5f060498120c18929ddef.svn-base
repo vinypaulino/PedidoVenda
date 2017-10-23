@@ -1,0 +1,133 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.naja.controller;
+
+import com.naja.rn.ProjetoRN;
+import com.naja.model.Departamento;
+import com.naja.model.Grupo;
+import com.naja.model.Projeto;
+import com.naja.rn.UsuarioRN;
+import com.naja.model.Usuario;
+import com.naja.rn.DepartamentoRN;
+import com.naja.rn.GrupoRN;
+import com.naja.util.Controller;
+import com.naja.util.jpa.Transactional;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+import javax.annotation.PostConstruct;
+import javax.inject.Named;
+import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
+
+/**
+ *
+ * @author Lemoel Marques lemoel@gmail.com NajaSoftware
+ */
+@Named
+@ViewScoped
+public class CadUsuarioController extends Controller implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Inject
+    private Usuario usuario;
+
+    @Inject
+    private Grupo grupo;
+
+    @Inject
+    private UsuarioRN usuarioRN;
+
+    @Inject
+    private DepartamentoRN departamentoRN;
+
+    @Inject
+    private GrupoRN grupoRN;
+
+    @Inject
+    private ProjetoRN projetoRN;
+
+    private List<Departamento> departamentoList;
+    private List<Grupo> grupoList;
+    private List<Projeto> projetoList;
+    private List<Usuario> usuarioList;
+    private String confirmaSenha;
+
+    @PostConstruct
+    public void init() {
+        usuario = new Usuario();
+        usuario.setStatus(true);
+        usuarioList = usuarioRN.todosAtivo();
+    }
+
+    @Transactional
+    public void salvar() {
+        this.usuario.setDtCadastro(new Date());
+        usuarioRN.salvar(this.usuario);        
+        init();
+        info("Usuário Salvo com sucesso");
+    }
+
+    @Transactional
+    public void deletar() {
+        usuarioRN.deletar(usuario);
+        init();
+        info("Usuario Deletado com sucesso");
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+
+    public List<Departamento> getDepartamentoList() {
+
+        if (departamentoList == null) {
+            departamentoList = departamentoRN.todos();
+        }
+        return departamentoList;
+    }
+
+    public List<Grupo> getGrupoList() {
+        if (grupoList == null) {
+            grupoList = grupoRN.todos();
+        }
+        return grupoList;
+    }
+
+    public List<Projeto> getProjetoList() {
+
+        if (projetoList == null) {
+            projetoList = projetoRN.todos();
+        }
+        return projetoList;
+    }
+
+    public void setConfirmaSenha(String confirmaSenha) {
+        this.confirmaSenha = confirmaSenha;
+    }
+
+    public String getConfirmaSenha() {
+        return confirmaSenha;
+    }
+
+    public List<Usuario> getUsuarioList() {
+        return usuarioList;
+    }
+
+    public Grupo getGrupo() {
+        return grupo;
+    }
+
+    public void setGrupo(Grupo grupo) {
+        this.grupo = grupo;
+    }
+
+}

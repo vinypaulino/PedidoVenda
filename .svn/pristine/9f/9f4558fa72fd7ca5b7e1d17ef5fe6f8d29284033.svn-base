@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context path="/age">
+  <Resource auth="Container" factory="org.jboss.weld.resources.ManagerObjectFactory" name="BeanManager" type="javax.enterprise.inject.spi.BeanManager"/>
+  <Resource auth="Container" driverClass="com.mysql.jdbc.Driver" factory="org.apache.naming.factory.BeanFactory" jdbcUrl="jdbc:mysql://localhost:3306/age" maxPoolSize="3" minPoolSize="3" name="jdbc/ageDB" password="" type="com.mchange.v2.c3p0.ComboPooledDataSource" user="root"/>
+</Context>

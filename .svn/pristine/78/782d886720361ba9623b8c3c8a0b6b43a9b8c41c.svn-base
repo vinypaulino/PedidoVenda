@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+    <persistence-unit name="SisNajaPU" transaction-type="RESOURCE_LOCAL">
+        <non-jta-data-source>java:comp/env/jdbc/ageDB</non-jta-data-source>
+        <properties>
+            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.format_sql" value="true"/>
+            <property name="hibernate.cache.use_second_level_cache" value="true"/>
+            <property name="hibernate.cache.use_query_cache" value="true"/>
+            <property name="hibernate.cache.region.factory_class" value="org.hibernate.cache.ehcache.EhCacheRegionFactory"/>
+            <!-- Apenas durante o Desenvolvimento vou colocar update depois passar colocar a linha de baixo pois funciona com JPA-->
+<!--            <property name="hibernate.hbm2ddl.auto" value="update"/>-->
+                  <property name="javax.persistence.schema-generation.database.action" value="none"/>
+            <property name="javax.persistence.schema-generation.create-source" value="metadata"/>
+            <property name="javax.persistence.sql-load-script-source" value="META-INF/sql/dados-iniciais.sql"/>
+        </properties>
+    </persistence-unit>
+</persistence>

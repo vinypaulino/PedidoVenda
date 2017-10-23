@@ -1,0 +1,53 @@
+@CHARSET "UTF-8";
+
+.ajax-status {
+    position: fixed;
+    top: 55px;
+    right: 10px;
+    width: 35px;
+    height: 35px;	
+    z-index: 9999;
+}
+
+.divPosition {
+    padding: 10px;
+}
+
+.textUpperCase {
+    text-transform: uppercase;
+}
+
+.textAlignRightLabel {
+    text-align: right;
+    font-weight: bold;	
+}
+
+.ui-panelgrid td {
+    height: 48px;	
+    /*	border: none !important;*/
+    background: #fafafa url(#{resource['img:cream.png']}) repeat;
+}
+
+.ui-tabs-panels {
+    background: #fafafa url(#{resource['img:cream.png']}) repeat;
+}
+
+.ui-selectmanycheckbox td label {
+    padding-right: 10px;
+}
+
+.ui-selectmanycheckbox td {
+    border-width: 0px !important;
+    padding: 0px !important;
+}
+
+.selectOneRadioPadding tbody tr td label {
+    padding-right: 12px; 
+    padding-left: 5px;
+}
+
+.ui-button {
+    left: 10px;
+    height: 31px !important;
+    max-width: 10px;    
+}

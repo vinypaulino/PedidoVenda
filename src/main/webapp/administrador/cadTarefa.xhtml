@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/template/layout.xhtml">
+
+    <ui:define name="corpo">                   
+        <f:metadata>
+            <f:viewParam name="usuario" />
+            <f:viewAction action="#{cadTarefaController.init}"/>
+            <!--<f:event listener="" type="preRenderView" />-->
+        </f:metadata>
+
+        <h:form id="frmCadTarefa" prependId="false">         
+            <h:inputHidden id="tarefaId" value="#{cadTarefaController.tarefa.id}"/>
+            <p:toolbar id="tb" styleClass="nj-toolbar">
+                <p:toolbarGroup align="left">
+                    <p:outputLabel style="padding-top: 5px; font-weight: 500; font-size: 1.3em; font-weight: bold; display: table-cell; vertical-align: middle; ">
+                        <i class="fa fa-fw fa-save" style="color: #2db994; font-size: 15px; margin-left: 10px; margin-right: 5px"></i>Cadastro de Tarefa
+                    </p:outputLabel>
+                </p:toolbarGroup>
+                <p:toolbarGroup align="right">
+                    <p:commandButton value="Salvar" update="tarefaId" icon="ui-icon-check" action="#{cadTarefaController.salvar}" />
+                    <span style="margin-right: 1px;"></span>
+                    <p:button value="Pesquisar" icon="fa fa-fw fa-search" outcome="busca"/>
+                    <span style="margin-right: 1px;"></span>
+                    <p:menuButton value="Relatório" style="margin-right: 15px;">
+                        <p:menuitem value="Save" icon="ui-icon-disk"/>
+                        <p:menuitem value="Update" icon="ui-icon-arrowrefresh-1-w"/>
+                        <p:menuitem value="Delete" icon="ui-icon-close"/>
+                        <p:separator />
+                        <p:menuitem value="Homepage" url="http://www.primefaces.org" icon="ui-icon-extlink"/>
+                    </p:menuButton>
+                </p:toolbarGroup>                             
+            </p:toolbar>
+            <p:messages id="messages" showDetail="false" autoUpdate="true" closable="true"/>
+            <p:sticky target="tb" />
+            <div style="margin-top: 7px;"> 
+                <div class="ui-fluid">
+                    <p:panelGrid columns="6" layout="grid"                                  
+                                 styleClass="panelgrid-noborder"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2">
+
+                        <p:outputLabel value="Titulo" for="titulo"/>
+                        <p:inputText id="titulo" required="true" value="#{cadTarefaController.tarefa.titulo}" />
+
+                        <p:outputLabel value="Descrição" for="descricao" />
+                        <p:inputTextarea id="descricao" required="true" value="#{cadTarefaController.tarefa.descricao}" rows="3"></p:inputTextarea>
+
+                        <p:outputLabel value="Tipo" for="tipo" />
+                        <p:selectOneMenu id="tipo" value="#{cadTarefaController.tarefa.tipo}" >
+                            <f:selectItem itemLabel="Selecione" itemValue="0" noSelectionOption="true"/>
+                            <f:selectItems value="#{cadTarefaController.tipoList}" var="tipo" itemValue="#{tipo}" itemLabel="#{tipo.nome}"/>
+                        </p:selectOneMenu>
+
+                    </p:panelGrid>
+
+                    <div class="ui-grid ui-grid-responsive">
+                        <br/>
+                        <div class="ui-grid-row">
+                            <div class="ui-grid-col-10"></div>
+                            <div class="ui-grid-col-1">
+                                <p:commandButton value="Salvar" update="tarefaId" icon="ui-icon-check" style="max-width: 100px; max-height: 40px;" action="#{cadTarefaController.salvar}" />                    
+                            </div>
+                            <span style="margin-right: 10px"></span>
+                            <div class="ui-grid-col-1" style="margin-right: 10px;">
+                                <p:button value="Limpar" icon="fa fa-fw fa-eraser" style="max-width: 100px; max-height: 40px; margin-left: 10px" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

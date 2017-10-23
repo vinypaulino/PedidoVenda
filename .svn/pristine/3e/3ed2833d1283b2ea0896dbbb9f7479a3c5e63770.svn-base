@@ -1,0 +1,136 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.naja.rn;
+
+import com.naja.enumerator.AtendimentoStatus;
+import com.naja.model.Atendimento;
+import com.naja.model.Usuario;
+import com.naja.reposity.Anotacoes;
+import com.naja.reposity.Atendimentos;
+import com.naja.reposity.Usuarios;
+import com.naja.util.DAOException;
+import com.naja.util.RegraNegocio;
+import com.naja.util.jpa.Transactional;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.inject.Inject;
+
+/**
+ *
+ * @author Lemoel Marques lemoel@gmail.com NajaSoftware
+ */
+public class AtendimentoRN extends RegraNegocio implements Serializable {
+
+    @Inject
+    private Atendimentos atendimentos;
+
+    @Inject
+    private Anotacoes anotacoes;
+
+    @Inject
+    private Usuarios usuarios;
+
+    @Transactional
+    public void salvar(Atendimento atendimento) {
+        try {
+            atendimentos.salvar(atendimento);
+        } catch (DAOException ex) {
+            Logger.getLogger(AtendimentoRN.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Transactional
+    public Atendimento selecionouAtendimento(Long idAtendimentoSelecionado) {
+        try {
+            Atendimento atendimento = porId(idAtendimentoSelecionado);
+            atendimento.setStatus(AtendimentoStatus.ATENDENDO);
+
+            //Trocando status do usuario após realizar o atendimento
+            Usuario usuario = contextoBean.getUsuario();
+
+            //Tornando ATTACHED
+            usuario = usuarios.porId(usuario.getId());
+
+            //Trocando status do usuario para livre.
+            usuario.setEmAtendimento(true);
+            atendimento.setAtendente(usuario);
+
+            atendimentos.salvar(atendimento);
+            
+            return atendimento;
+            
+        } catch (DAOException ex) {
+            Logger.getLogger(AtendimentoRN.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return null;
+    }
+
+    @Transactional
+    public void salvarAtendimentoSuporte(Atendimento atendimento) {
+        try {
+            //Trocando status do usuario após realizar o atendimento
+            Usuario usuario = atendimento.getAtendente();
+
+            //Tornando ATTACHED
+            usuario = usuarios.porId(usuario.getId());
+
+            //Trocando status do usuario para livre.
+            usuario.setEmAtendimento(false);
+            atendimento.setAtendente(usuario);
+
+            atendimentos.salvar(atendimento);
+        } catch (DAOException ex) {
+            Logger.getLogger(AtendimentoRN.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Transactional
+    public void deletar(Atendimento atendimento) {
+        try {
+            Atendimento at = atendimentos.porId(atendimento.getId());
+            if (at.getAnotacoes().isEmpty() && at.getStatus() == AtendimentoStatus.AG_ATENDIMENTO) {
+                atendimentos.deletar(at);
+                info("Atendimento deletadado com sucesso");
+            } else {
+                error("Atendimento possui anotações ou NÃO está no status 'aguardando atendimento'!");
+            }
+
+        } catch (DAOException ex) {
+            Logger.getLogger(AtendimentoRN.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    //Date dtInicioAtendimento, Date dtFimAtendimento, Atendimento atendimento, Anotacao anotacao
+    public List<Atendimento> localizar(Map criteriosBusca) {
+        return atendimentos.localizar(criteriosBusca);
+    }
+
+    public Atendimento porId(Long id) {
+        try {
+            return atendimentos.porId(id);
+        } catch (DAOException ex) {
+            Logger.getLogger(AtendimentoRN.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    public List<Atendimento> localizarSuporte(Map criteriosBusca) {
+        return atendimentos.localizarSuporte(criteriosBusca);
+    }
+
+    public int countAll(Map filtros) {
+        return atendimentos.countAll(filtros);
+    }
+
+    public List<Atendimento> buscaPorPaginacao(Map criteriosDaBusca, Map filtrosPrimefaces) {
+        return atendimentos.buscaPorPaginacao(criteriosDaBusca, filtrosPrimefaces);
+    }
+
+}

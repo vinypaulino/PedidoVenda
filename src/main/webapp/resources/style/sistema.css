@@ -1,0 +1,5 @@
+@CHARSET "UTF-8";
+
+.ui-state-disabled{
+    opacity: .99 !important;        
+}

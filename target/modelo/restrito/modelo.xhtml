@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/template/layout.xhtml">
+
+    <ui:define name="corpo">        
+        <h:form id="frmBusca">         
+            <p:toolbar id="tb" styleClass="nj-toolbar">
+                <f:facet name="left">
+                    <p:outputLabel style="padding-top: 5px; font-weight: 500; font-size: 1.3em; font-weight: bold; display: table-cell; vertical-align: middle; ">
+                        <i class="fa fa-fw fa-calendar" style="color: #2db994; font-size: 15px; margin-left: 10px; margin-right: 5px"></i>Buscar
+                    </p:outputLabel>
+                </f:facet>
+                <f:facet name="right">
+                    <p:commandButton type="button" value="Novo" icon="ui-icon-document" style="margin-right: 8px;" />
+
+                    <p:menuButton value="Relatório" style="margin-right: 15px;">
+                        <p:menuitem value="Save" icon="ui-icon-disk"/>
+                        <p:menuitem value="Update" icon="ui-icon-arrowrefresh-1-w"/>
+                        <p:menuitem value="Delete" icon="ui-icon-close"/>
+                        <p:separator />
+                        <p:menuitem value="Homepage" url="http://www.primefaces.org" icon="ui-icon-extlink"/>
+                    </p:menuButton>
+                </f:facet>                             
+            </p:toolbar>
+
+            <p:sticky target="tb" />
+            <div style="margin-top: 7px;"> 
+                <div class="ui-fluid">
+                  
+                    
+                </div>
+                <div class="ui-grid ui-grid-responsive">
+                        <br/>
+                        <div class="ui-grid-row">
+                            <div class="ui-grid-col-10"></div>
+                            <div class="ui-grid-col-1" style="margin-right: 8px;">
+                                <p:button value="Pesquisar" icon="fa fa-fw fa-search"/>
+                            </div>
+                            <div class="ui-grid-col-1" style="margin-right: 15px;">
+                                <p:button value="Limpar" icon="fa fa-fw fa-eraser"/>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </h:form>
+    </ui:define>
+
+</ui:composition>

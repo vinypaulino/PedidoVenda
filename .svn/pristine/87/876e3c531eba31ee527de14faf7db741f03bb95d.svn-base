@@ -1,0 +1,14 @@
+function configuraMoeda() {
+    $(".moeda").maskMoney({decimal: ",", thousands: ".", allowZero: true});
+}
+
+function timeOut() {
+    setTimeout(function () {
+        $('#messages').hide(1000);
+    }, 8000);
+}
+
+function subir() {
+    $('html, body').animate({scrollTop: 0}, 'slow');
+    return false;
+}

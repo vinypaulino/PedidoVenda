@@ -1,0 +1,28 @@
+<ui:composition 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui">
+
+
+    <p:toolbar id="tb" styleClass="nj-toolbar">
+
+        <p:toolbarGroup align="left">
+            <p:outputLabel style="padding-top: 5px; font-weight: 500; font-size: 1.3em; font-weight: bold; display: table-cell; vertical-align: middle; ">
+                <i class="fa fa-fw fa-save" style="color: #2db994; font-size: 15px; margin-left: 10px; margin-right: 5px"></i>#{cadastroPedidoBean.pedido.existente ? "Edicao de pedido" : "NovoPedido"}
+            </p:outputLabel>               
+
+        </p:toolbarGroup>
+        <br />
+        <p:toolbarGroup align="right">
+            <p:button value="Novo" outcome="/pedidos/CadastroPedido"/>
+            <p:commandButton value="Salvar" action="#{cadastroPedidoBean.salvar}"
+                             update="@form" disabled="#{cadastroPedidoBean.pedido.naoAlteravel}"/>
+            <p:commandButton value="Enviar" action="#{emissaoPedidoBean.emitirPedido}"
+                             process="@form" update="@form" disabled="#{cadastroPedidoBean.pedido.naoEmissivel}"/>
+        </p:toolbarGroup>
+        
+    </p:toolbar>
+
+</ui:composition>

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/template/layout.xhtml">
+
+    <ui:define name="corpo">                   
+        <f:metadata>
+            <f:viewParam name="empresa" />
+            <f:viewAction action="#{cadMenuController.init}"/>
+            <!--<f:event listener="" type="preRenderView" />-->
+        </f:metadata>
+
+        <h:form id="frmCadMenu" prependId="false">
+            <p:toolbar id="tb" styleClass="nj-toolbar">
+                <p:toolbarGroup align="left">
+                    <p:outputLabel style="padding-top: 5px; font-weight: 500; font-size: 1.3em; font-weight: bold; display: table-cell; vertical-align: middle; ">
+                        <i class="fa fa-fw fa-save" style="color: #2db994; font-size: 15px; margin-left: 10px; margin-right: 5px"></i>Administração de Menus
+                    </p:outputLabel>
+                </p:toolbarGroup>
+                <p:toolbarGroup align="right">
+                    <p:commandButton value="Salvar" oncomplete="timeOut()" update="frmMenuList frmCadMenu" icon="ui-icon-check" action="#{cadMenuController.salvar}" />
+                    <span style="margin-right: 1px;"></span>
+                    <p:button value="Pesquisar" icon="fa fa-fw fa-search" outcome="busca"/>
+                    <span style="margin-right: 1px;"></span>
+                    <p:menuButton value="Relatório" style="margin-right: 15px;">
+                        <p:menuitem value="Save" icon="ui-icon-disk"/>
+                        <p:menuitem value="Update" icon="ui-icon-arrowrefresh-1-w"/>
+                        <p:menuitem value="Delete" icon="ui-icon-close"/>
+                        <p:separator />
+                        <p:menuitem value="Homepage" url="http://www.primefaces.org" icon="ui-icon-extlink"/>
+                    </p:menuButton>
+                </p:toolbarGroup>
+            </p:toolbar>
+            <p:messages id="messages" showDetail="false" autoUpdate="true" closable="true"/>
+            <p:sticky target="tb" />
+            <div style="margin-top: 7px;">
+                <div class="ui-fluid">
+                    <p:panelGrid
+                        id ="pgMenu"
+                        columns="6" layout="grid"                              
+                        styleClass="panelgrid-noborder"
+                        columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2">
+
+                        <p:outputLabel value="Nome" for="nomeMenu"/>
+                        <p:inputText id="nomeMenu" required="true" value="#{cadMenuController.menu.nome}" />
+
+                        <p:outputLabel value="Menu Pai" for="menusPai" />
+                        <p:selectOneMenu id="menusPai" value="#{cadMenuController.menu.paiId}">
+                            <f:selectItem itemLabel="Selecione" itemValue="" noSelectionOption="true"/>
+                            <f:selectItems value="#{cadMenuController.menuList}" var="menuPai" itemValue="#{menuPai.id}" itemLabel="#{menuPai.nome}"/>
+                        </p:selectOneMenu>
+
+                        <p:outputLabel value="Url" for="url" />
+                        <p:inputText id="url" value="#{cadMenuController.menu.url}">
+                            <f:passThroughAttribute name="placeholder" value="/url/url" />	
+                        </p:inputText>
+
+                        <p:outputLabel value="Ícone" for="icone" />
+                        <p:inputText id="icone" value="#{cadMenuController.menu.icone}">
+                            <f:passThroughAttribute name="placeholder" value="ui-icone-home" />	
+                        </p:inputText>
+
+
+                        <p:outputLabel value="Grupo Visualizar" for="grupo" />
+                        <p:selectCheckboxMenu id="grupo" 
+                                              value="#{cadMenuController.menu.grupos}" 
+                                              label="Grupos" 
+                                              required="true"
+                                              converter="grupoConverter"
+                                              filter="true" 
+                                              class="oneMenuCliente"
+                                              filterMatchMode="startsWith" 
+                                              panelStyle="width:250px">
+                            <f:selectItems   value="#{cadMenuController.grupoList}" itemLabel="#{grupo.descricao}" itemValue="#{grupo}" var="grupo" />
+                        </p:selectCheckboxMenu>
+
+                        <p:outputLabel value="Nível" for="nivel" />
+                        <p:inputText id="nivel" value="#{cadMenuController.menu.nivel}">
+                            <f:passThroughAttribute name="placeholder" value="1" />	
+                        </p:inputText>
+
+                    </p:panelGrid>   
+                    <br/>
+                    <div style="float: right; width: 220px; margin-right: 5px; margin-bottom: 20px;margin-top:5px; ">
+                        <p:commandButton value="Salvar" oncomplete="timeOut()" icon="ui-icon-check" update="frmMenuList frmCadMenu" style="max-width: 100px; max-height: 40px;" action="#{cadMenuController.salvar}" />
+                        <p:button value="Limpar" icon="fa fa-fw fa-eraser" style="max-width: 100px; max-height: 40px; margin-left: 10px" />
+                    </div>
+                </div>
+            </div>
+        </h:form>
+        <h:form prependId="false" id="frmMenuList" rendered="#{!empty cadMenuController.menuList}">
+            <div style="margin-top:55px; ">
+                <p:dataTable var="menu" value="#{cadMenuController.menuList}">
+                    <f:facet name="header">Menus</f:facet>
+                    <p:column style="width:16px" priority="4">
+                        <p:rowToggler />
+                    </p:column>
+                    <p:column headerText="Id" style="width: 10%; text-align:center;" priority="3">
+                        <h:outputText value="#{menu.id}" />
+                    </p:column>
+                    <p:column headerText="Nome" priority="1">
+                        <h:outputText value="#{menu.nome}" />
+                    </p:column>
+                    <p:column headerText="Nivel" priority="2">
+                        <h:outputText value="#{menu.nivel}" />
+                    </p:column>
+                    <p:column headerText="Alterar" style="text-align:center;width:7%;" priority="2" >                                                
+                        <p:commandButton  style="width: 30px"  icon="ui-icon-pencil" process="@this" update="pgMenu">
+                            <f:setPropertyActionListener value="#{menu}" target="#{cadMenuController.menu}" />
+                        </p:commandButton>
+                    </p:column>
+
+                    <p:rowExpansion>
+                        <p:dataTable
+                            style="margin-top: 10px; margin-bottom: 10px;" 
+                            resizableColumns="true"
+                            draggableColumns="true"
+                            value="#{cadMenuController.menuFilho(menu)}" 
+                            var="menuFilho"
+                            emptyMessage="Nenhuma anotação cadastrada!">
+                            <p:column style="text-align:center;width:8%;" headerText="Id" priority="3">
+                                <h:outputText value="#{menuFilho.id}"/>
+                            </p:column>
+                            <p:column style="text-align:center;width:10%;" headerText="Descrição" priority="2">
+                                <h:outputText value="#{menuFilho.nome}"/>
+                            </p:column>
+                            <p:column style="text-align:center;width:40%;" headerText="URL" priority="1">
+                                <h:outputText value="#{menuFilho.url}"/>
+                            </p:column>  
+                            <p:column style="text-align:center;width:8%;" headerText="Pai Id" priority="3">
+                                <h:outputText value="#{menuFilho.paiId}"/>
+                            </p:column>
+                            <p:column style="text-align:center;width:8%;" headerText="Nível" priority="4">
+                                <h:outputText value="#{menuFilho.nivel}"/>
+                            </p:column>   
+                            <p:column style="text-align:center;width:10%;" headerText="Grupo" priority="4">
+                                <ui:repeat value="#{menuFilho.grupos}" var="grupo">
+                                    <h:outputText value="#{grupo.descricao}"/><br/>
+                                </ui:repeat>
+                            </p:column>   
+                            <p:column headerText="Alterar" style="text-align:center;width:7%;" priority="2" >
+                                <p:commandButton  style="width: 30px"  icon="ui-icon-pencil" process="@this" update="pgMenu">
+                                    <f:setPropertyActionListener value="#{menuFilho}" target="#{cadMenuController.menu}" />
+                                </p:commandButton>
+                            </p:column>
+                        </p:dataTable>
+                    </p:rowExpansion>
+                </p:dataTable>
+            </div>   
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <h:head>
+        <f:facet name="first">
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+        </f:facet>
+        <title>Naja</title>
+        <h:outputStylesheet library="primefaces" name="grid/grid.css"/>
+        <h:outputStylesheet library="style" name="layout.css"/>
+        <h:outputStylesheet library="style" name="components.css"/>
+        <h:outputStylesheet library="style" name="custom.css"/>
+        <h:outputScript target="body" library="primefaces" name="jquery/jquery.js"/>
+        <h:outputScript target="body" library="js" name="app.js"/>
+    </h:head>
+    <h:body>
+        <header class="nj-topbar">
+            <h:graphicImage library="img" name="logo.png"/>
+            <a href="#" class="nj-toggle js-alternar"><i class="fa fa-bars"></i></a> 
+            <p:button  style="float: right; margin-right: 35px; margin-top: 10px;" 
+                       value="Sair"/>
+
+        </header>
+
+        <aside class="nj-sidebar js-sidebar">
+            <nav class="nj-menu">
+                <h:form>
+                    <p:growl autoUpdate="true"/>                   
+
+                    <p:panelMenu>
+                        <p:submenu label="Agenda" icon="ui-icon-check" >                            
+                            <p:menuitem value="Agenda Comercial"  outcome="/comercial/busca" icon="ui-icon-disk"/>
+                            <p:menuitem value="Relatório"  icon="ui-icon-print" />   
+                            <p:menuitem value="Sair"  onclick="document.location = '#{request.contextPath}/j_spring_security_logout'" icon="ui-icon-signal"/>
+                        </p:submenu>
+                        <p:submenu label="Relatório">
+                            <p:menuitem value="Cliente" ajax="false" icon="ui-icon-close"/>
+                        </p:submenu>                        
+                        <p:submenu label="Configurações" >
+                            <p:submenu label="Links" icon="ui-icon-extlink" >
+                                <p:submenu label="PrimeFaces" icon="ui-icon-heart">
+                                    <p:menuitem value="Home" url="http://www.primefaces.org" icon="ui-icon-home"/>
+                                    <p:menuitem value="Docs" url="http://www.primefaces.org/documentation" icon="ui-icon-document" />
+                                    <p:menuitem value="Download" url="http://www.primefaces.org/downloads" icon="ui-icon-arrowthick-1-s" />
+                                    <p:menuitem value="Support" url="http://www.primefaces.org/support" icon="ui-icon-wrench"/>
+                                </p:submenu>
+                            </p:submenu>
+                            <p:menuitem value="Mobile"  icon="ui-icon-signal"/>
+                        </p:submenu>                        
+                    </p:panelMenu>
+
+                </h:form>
+            </nav>
+        </aside>
+
+        <section class="nj-content js-content">
+            <ui:insert name="corpo"/>
+        </section>
+
+    </h:body>
+</html>

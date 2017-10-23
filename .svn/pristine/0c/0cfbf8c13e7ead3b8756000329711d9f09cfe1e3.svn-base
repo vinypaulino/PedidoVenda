@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/template/layout.xhtml">
+
+    <ui:define name="corpo">                   
+        <f:metadata>
+            <f:viewParam name="empresa" />
+            <f:viewAction action="#{cadDepartamentoController.init}"/>
+            <!--<f:event listener="" type="preRenderView" />-->
+        </f:metadata>
+
+        <h:form id="frmCadDepartamento" prependId="false">
+            <h:inputHidden id="departamentoId" value="#{cadDepartamentoController.departamento.id}"/>
+            <p:toolbar id="tb" styleClass="nj-toolbar">
+                <p:toolbarGroup align="left">
+                    <p:outputLabel style="padding-top: 5px; font-weight: 500; font-size: 1.3em; font-weight: bold; display: table-cell; vertical-align: middle; ">
+                        <i class="fa fa-fw fa-save" style="color: #2db994; font-size: 15px; margin-left: 10px; margin-right: 5px"></i>Administração de Departamentos
+                    </p:outputLabel>
+                </p:toolbarGroup>
+                <p:toolbarGroup align="right">
+                    <p:commandButton value="Salvar" icon="ui-icon-check" oncomplete="timeOut()" action="#{cadDepartamentoController.salvar}" />
+                    <span style="margin-right: 25px;"></span>
+                </p:toolbarGroup>
+            </p:toolbar>
+            <p:messages id="messages" showDetail="false" autoUpdate="true" closable="true"/>
+            <p:sticky target="tb" />
+            <div style="margin-top: 7px;">
+                <div class="ui-fluid">
+                    <p:panelGrid columns="3" layout="grid" id="formDepartamento"
+                                 styleClass="panelgrid-noborder"
+                                 columnClasses="ui-grid-col-2,ui-grid-col-6,ui-grid-col-4">
+
+                        <p:outputLabel value="Nome Departamento" for="nomeDepartamento"/>
+                        <p:inputText id="nomeDepartamento" required="true" value="#{cadDepartamentoController.departamento.nome}" />                        
+                        <h:panelGroup>
+                            <p:commandButton value="Salvar" oncomplete="timeOut()" update="dtDepartamento nomeDepartamento" icon="ui-icon-check" style="max-width: 100px; max-height: 40px;" action="#{cadDepartamentoController.salvar}" />
+                            <p:button value="Limpar" icon="fa fa-fw fa-eraser" style="max-width: 100px; max-height: 40px; margin-left: 10px" />   
+                        </h:panelGroup>
+                    </p:panelGrid>     
+                </div>
+            </div>
+        </h:form>
+        <br/>                 
+        <h:form prependId="false" id="dtDepartamento">
+            <div style="margin-top:10px;">
+                <p:dataTable 
+                    paginator="true"                                                      
+                    rows="20"
+                    paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                    rowsPerPageTemplate="10,15,20"
+                    resizableColumns="true" 
+                    draggableColumns="true"                                
+                    emptyMessage="Nenhum Departamento Cadastrado."
+                    var="dep" value="#{cadDepartamentoController.departamentoList}" >
+                    <f:facet name="header">Grupos</f:facet>                                
+                    <p:column headerText="Id" priority="3" style="text-align:center;width:10%;">
+                        <h:outputText value="#{dep.id}" />
+                    </p:column>
+                    <p:column headerText="Nome" priority="1">
+                        <h:outputText value="#{dep.nome}" />
+                    </p:column>
+
+                    <p:column headerText="Ferramenta" priority="2" style="text-align:center;width:10%;">                                                
+                        <p:commandButton  style="width: 30%" icon="ui-icon-trash" process="@this" action="#{cadDepartamentoController.deletar}" update="dtDepartamento" >
+                            <f:setPropertyActionListener value="#{dep}" target="#{cadDepartamentoController.departamento}" />
+                        </p:commandButton>
+                        <span style="padding-left:4px"></span>
+                        <p:commandButton  style="width: 30%"  icon="ui-icon-pencil" process="@this" update="departamentoId nomeDepartamento " >
+                            <f:setPropertyActionListener value="#{dep}" target="#{cadDepartamentoController.departamento}" />
+                        </p:commandButton>
+                    </p:column>
+
+                </p:dataTable>
+            </div>
+        </h:form>       
+    </ui:define>
+</ui:composition>

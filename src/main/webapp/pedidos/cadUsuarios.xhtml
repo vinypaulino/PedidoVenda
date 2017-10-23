@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                template="/WEB-INF/template/layout.xhtml">
+
+    <ui:define name="corpo">                   
+        <f:metadata>
+            <f:viewParam name="usuario" />
+            <f:viewAction action="#{cadUsuarioController.init}"/>
+            <!--<f:event listener="" type="preRenderView" />-->
+        </f:metadata>
+
+        <h:form id="frmCadUsuario" prependId="false">         
+            <h:inputHidden id="usuarioId" value="#{cadUsuarioController.usuario.id}"/>
+            <p:toolbar id="tb" styleClass="nj-toolbar">
+                <p:toolbarGroup align="left">
+                    <p:outputLabel style="padding-top: 5px; font-weight: 500; font-size: 1.3em; font-weight: bold; display: table-cell; vertical-align: middle; ">
+                        <i class="fa fa-fw fa-save" style="color: #2db994; font-size: 15px; margin-left: 10px; margin-right: 5px"></i>Cadastro de Usuários
+                    </p:outputLabel>
+                </p:toolbarGroup>
+                <p:toolbarGroup align="right">
+                    <p:commandButton value="Salvar" update="usuarioId, pgCadUsuario, frmUsuarioList" icon="ui-icon-check" action="#{cadUsuarioController.salvar}" />
+                    <span style="margin-right: 1px;"></span>
+                    <p:button value="Pesquisar" icon="fa fa-fw fa-search" />
+                    <span style="margin-right: 1px;"></span>
+                    <p:menuButton value="Relatório" style="margin-right: 15px;">
+                        <p:menuitem value="Save" icon="ui-icon-disk"/>
+                        <p:menuitem value="Update" icon="ui-icon-arrowrefresh-1-w"/>
+                        <p:menuitem value="Delete" icon="ui-icon-close"/>
+                        <p:separator />
+                        <p:menuitem value="Homepage" url="http://www.primefaces.org" icon="ui-icon-extlink"/>
+                    </p:menuButton>
+                </p:toolbarGroup>                             
+            </p:toolbar>
+            <p:messages id="messages" showDetail="false" autoUpdate="true" closable="true"/>
+            <p:sticky target="tb" />
+            <div style="margin-top: 7px;"> 
+                <div class="ui-fluid">
+                    <p:panelGrid columns="6" layout="grid" 
+                                 id="pgCadUsuario"
+                                 styleClass="panelgrid-noborder"
+                                 columnClasses="ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2, ui-grid-col-2">
+
+                        <!--                    1 linha-->
+                        <p:outputLabel value="Primeiro Nome" for="primeiroNome"/>
+                        <p:inputText id="primeiroNome" required="true" value="#{cadUsuarioController.usuario.primeiroNome}" />
+
+                        <p:outputLabel value="Sobrenome" for="sobreNome"/>
+                        <p:inputText id="sobreNome" required="true" value="#{cadUsuarioController.usuario.nome}" />
+
+                        <p:outputLabel value="Email" for="email" />
+                        <p:inputText id="email" required="true" value="#{cadUsuarioController.usuario.email}">
+                            <f:passThroughAttribute name="placeholder" value="email@email.com" />	
+                        </p:inputText>
+
+                        <p:outputLabel value="Grupo" for="grupo" />
+                        <p:selectCheckboxMenu id="grupo" value="#{cadUsuarioController.usuario.grupos}" label="Grupos" converter="grupoConverter"
+                                              filter="true" filterMatchMode="startsWith" panelStyle="width:250px">
+                            <f:selectItems  value="#{cadUsuarioController.grupoList}" itemLabel="#{grupo.descricao}" itemValue="#{grupo}" var="grupo" />
+                        </p:selectCheckboxMenu>
+
+                        <!--                        <p:outputLabel value="Projeto" for="projeto" />
+                                                <p:selectCheckboxMenu id="projeto" value="#{cadUsuarioController.usuario.projetos}" label="Projetos" converter="projetoConverter"
+                                                                      filter="true" filterMatchMode="startsWith" panelStyle="width:250px">
+                                                    <f:selectItems itemLabel="#{projeto.nome}" itemValue="#{projeto}" var="projeto" value="#{cadUsuarioController.projetoList}" />
+                                                </p:selectCheckboxMenu>-->
+
+                        <p:outputLabel value="Senha" for="senha"/>                        
+                        <p:password feedback="true" id="senha" value="#{cadUsuarioController.usuario.senha}" match="confirmaSenha"  label="Senha" required="true" />
+
+                        <p:outputLabel value="Confirma" for="confirmaSenha"/>                        
+                        <p:password id="confirmaSenha" value="#{cadUsuarioController.confirmaSenha}" label="Confirma" required="true" />
+
+                        <p:outputLabel value="Ativo" for="status" />
+                        <p:selectOneRadio id="status" value="#{cadUsuarioController.usuario.status}">
+                            <f:selectItem itemLabel="Sim" itemValue="true" />
+                            <f:selectItem itemLabel="Nao" itemValue="false" />
+                        </p:selectOneRadio>
+
+                        <p:outputLabel value="Telefone 1" for="telefone"/>
+                        <p:inputMask id="telefone" value="#{cadUsuarioController.usuario.telefone}" mask="(99) 99999-9999"/>
+
+                        <p:outputLabel value="Telefone 2" for="telefone2"/>
+                        <p:inputMask id="telefone2" value="#{cadUsuarioController.usuario.telefone2}" mask="(99) 99999-9999"/>
+
+                    </p:panelGrid>
+
+                    <div class="ui-grid ui-grid-responsive">
+                        <br/>
+                        <div class="ui-grid-row">
+                            <div class="ui-grid-col-10"></div>
+
+                            <div class="ui-grid-col-1">
+                                <p:commandButton process="@this" value="Endereço" icon="fa fa-plus" style="max-width: 100px; max-height: 400px; margin-left: 10px; height: 90px; " onclick="PF('dlgEndereco').show();"/>
+                            </div>
+                            <span style="margin-right: 10px"></span>
+                            <div class="ui-grid-col-1" style="margin-right: 10px;">
+                                <p:button value="Limpar" icon="fa fa-fw fa-eraser" style="max-width: 100px; max-height: 40px; margin-left: 10px" />
+                            </div>
+                            <span style="margin-right: 10px"></span>
+
+
+                            <div style="margin-right: 10px;">
+                                <p:commandButton value="Salvar" update="usuarioId, pgCadUsuario, frmUsuarioList" icon="ui-icon-check" style="max-width: 100px; max-height: 40px;" action="#{cadUsuarioController.salvar}" />                                                    
+                            </div>
+                        </div>
+                    </div>
+<!--
+                    <p:dataTable value="#{cadUsuarioController.enderecosDoUsuario}" var="endereco" 
+                                 id="tabelaEnderecos" emptyMessage="Nenhum Endereco">
+                        <p:column>
+                            <h:outputText value="#{endereco.descricaoEndereco}" />
+                        </p:column>
+
+                        <p:column>
+                            <p:commandLink value="X" />
+                        </p:column>
+                    </p:dataTable>-->
+                </div>
+            </div>
+        </h:form>
+        <h:form id="frmAdicionaEndereco">
+            <p:dialog header="Adicionar Endereço" widgetVar="dlgEndereco" modal="true" height="400" responsive="true">
+                <p:panelGrid columns="2" >
+
+                    <p:outputLabel value="Desc Endereco: " for="rua"/>
+                    <p:inputText id="descEndereco" value="#{cadUsuarioController.descricaoEndereco}" placeholder="ex: Casa, Escritorio" />
+
+                    <p:outputLabel value="Rua: " for="rua"/>
+                    <p:inputText id="rua" value="#{cadUsuarioController.nomeRua}" />
+
+                    <p:outputLabel value="Numero: " for="numero"/>
+                    <p:inputText id="numero" value="#{cadUsuarioController.numero}" />
+
+                    <p:outputLabel value="Complemento: " for="complemento"/>
+                    <p:inputText id="complemento" value="#{cadUsuarioController.complemento}" />
+
+                    <p:outputLabel value="Cep: " for="cep"/>
+                    <p:inputText id="cep" value="#{cadUsuarioController.cep}" />
+
+
+                    <p:outputLabel/>
+<!--                    <p:commandButton value="Adicionar" oncomplete="PF('dlgEndereco').hide(); #{cadUsuarioController.novoEndereco()}"
+                                     action="#{cadUsuarioController.adicionarEndereco}" process="@form"
+                                     update=":frmCadUsuario:tabelaEnderecos @form" style="float: right" />-->
+
+                </p:panelGrid>
+            </p:dialog>       
+        </h:form>
+
+
+
+        <h:form prependId="false" id="frmUsuarioList">
+            <div style="margin-top:15px">
+                <p:dataTable 
+                    paginator="true"                                                      
+                    rows="20"
+                    paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                    rowsPerPageTemplate="10,15,20"
+                    resizableColumns="true" 
+                    draggableColumns="true"                                
+                    emptyMessage="Nenhum Usuário Cadastrado."
+                    var="usuario" value="#{cadUsuarioController.usuarioList}" id="dtUsuarios" >
+                    <f:facet name="header">Usuários</f:facet>                                
+                    <p:column headerText="Id" priority="6" style="width: 5%;text-align: center">
+                        <h:outputText value="#{usuario.id}"/>
+                    </p:column>
+                    <p:column headerText="Nome" priority="1">
+                        <h:outputText value="#{usuario.primeiroNome} #{usuario.nome}" />
+                    </p:column>
+                    <p:column headerText="Email" priority="3">
+                        <h:outputText value="#{usuario.email}" />
+                    </p:column>
+                    <p:column headerText="Grupo" priority="5">
+                        <ui:repeat var="grupo" value="#{usuario.grupos}">
+                            <h:outputText value="#{grupo.nome}" />                                
+                            <br/>                                
+                        </ui:repeat>
+                    </p:column>
+                    <p:column headerText="Status" priority="2" style="width: 10%">
+                        <h:outputText value="#{usuario.status == true ? 'Ativo' : 'Inativo'}" />
+                    </p:column>
+
+                    <p:column headerText="Ferramenta" style="text-align:center;width:10%;" priority="4" >
+                        <p:commandButton  style="width: 30px" icon="ui-icon-trash" process="@this" action="#{cadUsuarioController.deletar}" update="usuarioId dtUsuarios" >
+                            <f:setPropertyActionListener value="#{usuario}" target="#{cadUsuarioController.usuario}" />
+                        </p:commandButton>
+                        <span style="padding-left:4px"></span>
+                        <p:commandButton  style="width: 30px"  icon="ui-icon-pencil" process="@this" update="usuarioId" >
+                            <f:setPropertyActionListener value="#{usuario}" target="#{cadUsuarioController.usuario}" />
+                        </p:commandButton>
+                    </p:column>
+
+                </p:dataTable>
+
+            </div>
+
+        </h:form>
+    </ui:define>
+</ui:composition>

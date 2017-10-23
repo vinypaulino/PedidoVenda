@@ -1,0 +1,64 @@
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/security
+           http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+           
+    <beans:bean id="appUserDetailsService" class="com.naja.security.AppUserDetailsService" />
+    
+    <beans:bean id="exceptionTranslationFilter" class="org.springframework.security.web.access.ExceptionTranslationFilter">
+        <beans:property name="accessDeniedHandler" ref="jsfAccessDeniedHandler"/>
+        <beans:property name="authenticationEntryPoint" ref="authenticationEntryPoint"/>
+    </beans:bean>
+	
+    <beans:bean id="jsfAccessDeniedHandler" class="com.naja.security.JsfAccessDeniedHandler">
+        <beans:property name="loginPath" value="/acessoNegado.xhtml" />
+        <beans:property name="contextRelative" value="true" />
+    </beans:bean>
+	
+    <beans:bean id="authenticationEntryPoint" class="com.naja.security.JsfLoginUrlAuthenticationEntryPoint">
+        <beans:property name="loginFormUrl" value="/publico/login.xhtml"/>
+        <beans:property name="redirectStrategy" ref="jsfRedirectStrategy" />
+    </beans:bean>
+	
+    <beans:bean id="jsfRedirectStrategy" class="com.naja.security.JsfRedirectStrategy"/>
+    
+    <http pattern="/javax.faces.resource/**" security="none" />
+    <http pattern="/resources/**" security="none" />
+    <http pattern="/teste/**" security="none"  />
+    <http pattern="/publico/**" security="none" />
+    <http pattern="/erro.xhtml" security="none" />
+    
+    <http auto-config="false" use-expressions="true">
+        <custom-filter ref="exceptionTranslationFilter" before="FILTER_SECURITY_INTERCEPTOR" />
+    
+        <intercept-url pattern="/acessoNegado.xhtml" access="isAuthenticated()" />
+        <intercept-url pattern="/index.html" access="isAuthenticated()" />
+        <intercept-url pattern="/restrito/**" access="isAuthenticated()" />
+        <intercept-url pattern="/administrador/**" access="hasAnyRole('ADMINISTRADORES')" />
+        <!--        <intercept-url pattern="/teste/**" access="isAuthenticated()" />-->
+        <intercept-url pattern="/comercial/**" access="hasAnyRole('ADMINISTRADORES','COMERCIAL-VENDEDORES','COMERCIAL-CHEFE')" />
+        <intercept-url pattern="/financeiro/**" access="hasAnyRole('FINANCEIRO', 'ADMINISTRADORES')" />
+        <intercept-url pattern="/manutencao/**" access="hasAnyRole('ADMINISTRADORES')" />
+        <intercept-url pattern="/suporte/**" access="hasAnyRole('ADMINISTRADORES','SUPORTE')" />
+        <intercept-url pattern="/atendimento/**" access="hasAnyRole('ADMINISTRADORES','SUPORTE')" />
+        <intercept-url pattern="/cliente/**" access="hasAnyRole('ADMINISTRADORES','SUPORTE')" />
+        <intercept-url pattern="/gestaoQualidade/agenda/**" access="hasAnyRole('AGENDA','ADMINISTRADORES')" />
+        <intercept-url pattern="/gestaoQualidade/admGestaoQualidade/**" access="hasAnyRole('ADMINISTRADORES','ADM-GESTAO-QUALIDADE')" />
+        <intercept-url pattern="/**" access="denyAll" />
+        
+        <form-login login-page="/publico/login.xhtml" authentication-failure-url="/publico/login.xhtml?invalid=true" 
+                    default-target-url="/" always-use-default-target="true" />
+        <logout logout-url="/j_spring_security_logout" invalidate-session="true" />
+        
+    </http>
+	
+    <authentication-manager>
+        <authentication-provider user-service-ref="appUserDetailsService">
+            <password-encoder hash="md5" /> 
+        </authentication-provider>
+    </authentication-manager>
+           
+</beans:beans>

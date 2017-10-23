@@ -1,0 +1,39 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <div class="ui-g">
+        <p:panelGrid columns="4" style="width: 100%; margin-top: 20px" layout="grid" styleClass="ui-fluid" columnClasses="rotulo, campo, rotulo, campo" >
+
+            <p:outputLabel value="Número" rendered="#{cadastroPedidoBean.pedido.existente}"/>
+            <h:outputText value="#{cadastroPedidoBean.pedido.id}" rendered="#{cadastroPedidoBean.pedido.existente}"/>
+
+            <p:outputLabel value="Data de criação" rendered="#{cadastroPedidoBean.pedido.existente}" />
+            <h:outputText value="#{cadastroPedidoBean.pedido.dataCriacao}" rendered="#{cadastroPedidoBean.pedido.existente}" >
+                <f:convertDateTime pattern="dd/MM/yyyy"/>
+            </h:outputText>
+
+            <p:outputLabel value="Status"/>
+            <h:outputText value="#{cadastroPedidoBean.pedido.status.descricao}" />
+
+            <p:outputLabel value="Forma de pagamento" for="formaPagamento"/>
+            <p:selectOneMenu id="formaPagamento" value="#{cadastroPedidoBean.pedido.formaPagamento}"
+                             disabled="#{cadastroPedidoBean.pedido.naoAlteravel}">
+                <f:selectItem itemLabel="Selecione" />  
+                <f:selectItems value="#{cadastroPedidoBean.formasPagamento}" var="formaPagamento" 
+                               itemValue="#{formaPagamento}" itemLabel="#{formaPagamento.descricao}" />                      
+            </p:selectOneMenu>
+
+            <p:outputLabel value="Total do pedido" style="font-weight: bold; font-size: 1.1em"/>
+            <h:outputText value="#{cadastroPedidoBean.pedido.valorTotal}" 
+                          style="font-weight: bold; font-size: 1.1em" id="totalPedido">
+                <f:convertNumber type="currency" />
+            </h:outputText> 
+            <p:commandButton value="Enviar Entrega" icon="fa fa-fw fa-save" action="#{cadastroPedidoBean.enviarEntrega}" id="btnEnviarEntrega" update="@form" rendered="#{cadastroPedidoBean.administrador}"/>  
+            <p:commandButton value="Finalizar Pedido" icon="fa fa-fw fa-save" action="#{cadastroPedidoBean.finalizarPedido}" id="btnFinalizar" update="@form" rendered="#{cadastroPedidoBean.administrador}"/>  
+        </p:panelGrid>
+    </div>
+
+</ui:composition>

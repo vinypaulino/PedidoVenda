@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <h:head>
+        <f:facet name="first">
+            <meta charset="UTF-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+        </f:facet>
+        <title>Naja</title>        
+        <h:outputStylesheet library="primefaces" name="grid/grid.css"/>
+        <h:outputStylesheet library="style" name="layout.css"/>
+        <h:outputStylesheet library="style" name="components.css"/>
+        <h:outputStylesheet library="style" name="custom.css"/>
+        <h:outputScript target="body" library="primefaces" name="jquery/jquery.js"/>
+        <h:outputScript target="body" library="js" name="app.js"/>
+        <h:outputScript target="body" library="js" name="util.js"/>
+        <link rel="shortcut icon" type="image/x-icon" href="#{request.contextPath}/resources/img/favicon.ico" />        
+    </h:head>
+    <h:body>  
+        <!--        "GIRO" do ajax no centro da tela-->
+        <p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+        <!--        Usado para abrir um DIALOG-->
+        <p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+            <h:graphicImage library="img" name="carregando.gif" />				
+        </p:dialog>
+        <header class="nj-topbar">
+            <h:graphicImage library="img" name="logo.png"/>
+            <a href="#" style="width: 20px;" class="nj-toggle js-alternar"><i class="fa fa-bars"></i></a> 
+            <p:button  image="ui-icon-power" style="float: right; margin-right: 27px !important; margin-top: 10px;" href="#{request.contextPath}/j_spring_security_logout" value="Sair"/>               
+            <strong><p:outputLabel  style="float: right; margin-right: 13px !important; margin-top: 17px;" value="#{contextoBean.usuario.primeiroNome}"/></strong>
+            <p:outputLabel  style="float: right; margin-right: 13px !important; margin-top: 17px;" value="#{contextoBean.usuario.departamento.nome}"/>
+        </header>
+
+        <aside class="nj-sidebar js-sidebar">
+            <nav class="nj-menu">
+                <h:form>
+                    <p:growl autoUpdate="true"/>
+                    <p:menu toggleable="true" model="#{contextoBean.menuModel}"/>
+                </h:form>
+            </nav>
+        </aside>
+
+        <section class="nj-content js-content">
+            <ui:insert name="corpo"/>
+        </section>
+
+    </h:body>
+</html>
